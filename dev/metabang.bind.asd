@@ -33,11 +33,20 @@ DISCUSSION
 (defpackage :metabang.bind-system (:use #:cl #:asdf))
 (in-package :metabang.bind-system)
 
-(defsystem METABANG.BIND
+(defsystem metabang.bind
   :version "0.2"
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let* and destructuring-bind."
   :components ((:file "bind")))
+
+;;; ---------------------------------------------------------------------------
+
+(asdf:defsystem-connection bind-and-metatilities
+  :requires (metabang.bind metatilities-base)
+  :perform (load-op :after (op c)
+                    (print "howdy")
+                    (use-package (find-package "METABANG.BIND") 
+                                 (find-package "METATILITIES")))) 
 
 
