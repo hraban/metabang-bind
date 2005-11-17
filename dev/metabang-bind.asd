@@ -33,7 +33,10 @@ DISCUSSION
 (defpackage :metabang.bind-system (:use #:cl #:asdf))
 (in-package :metabang.bind-system)
 
-(defsystem metabang.bind
+(print (find-system 'asdf-system-connections))
+(asdf:operate 'asdf:load-op 'asdf-system-connections)
+
+(defsystem metabang-bind
   :version "0.2"
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
@@ -43,9 +46,8 @@ DISCUSSION
 ;;; ---------------------------------------------------------------------------
 
 (asdf:defsystem-connection bind-and-metatilities
-  :requires (metabang.bind metatilities-base)
+  :requires (metabang-bind metatilities-base)
   :perform (load-op :after (op c)
-                    (print "howdy")
                     (use-package (find-package "METABANG.BIND") 
                                  (find-package "METATILITIES")))) 
 
