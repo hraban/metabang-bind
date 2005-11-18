@@ -30,10 +30,9 @@ DISCUSSION
 
 |#
 
-(defpackage :metabang.bind-system (:use #:cl #:asdf))
-(in-package :metabang.bind-system)
+(defpackage "METABANG.BIND-SYSTEM" (:use #:cl #:asdf))
+(in-package "METABANG.BIND-SYSTEM")
 
-(print (find-system 'asdf-system-connections))
 (asdf:operate 'asdf:load-op 'asdf-system-connections)
 
 (defsystem metabang-bind
@@ -41,7 +40,8 @@ DISCUSSION
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let* and destructuring-bind."
-  :components ((:file "bind")))
+  :components ((:module "dev"
+	            :components ((:file "bind")))))
 
 ;;; ---------------------------------------------------------------------------
 
