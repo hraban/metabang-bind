@@ -1,7 +1,5 @@
 #| simple-header
 
-$Id: bind.lisp,v 1.5 2004/08/30 16:57:28 gwking Exp $
-
 http://www.opensource.org/licenses/mit-license.php
 
 Copyright (c) 2004-2005 Gary Warren King, metabang.com
