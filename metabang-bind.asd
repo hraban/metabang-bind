@@ -31,6 +31,16 @@ DISCUSSION
 (defpackage "METABANG.BIND-SYSTEM" (:use #:cl #:asdf))
 (in-package "METABANG.BIND-SYSTEM")
 
+;; try hard
+(unless (find-system 'asdf-system-connections nil)
+ (when (find-package 'asdf-install)
+   (funcall (intern "INSTALL" "ASFD-INSTALL") 'asdf-system-connections)))
+;; give up with a useful (?) error message
+(unless (find-system 'asdf-system-connections nil)
+  (error "The bind system requires ASDF-SYSTEM-CONNECTIONS. See 
+http://www.cliki.net/asdf-system-connections for details and download
+instructions."))
+
 (asdf:operate 'asdf:load-op 'asdf-system-connections)
 
 (defsystem metabang-bind

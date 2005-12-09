@@ -10,7 +10,7 @@
    (:BODY
     ((:DIV :CLASS "header")
      (:H1 "metabang.bind")
-     "Pedal to the medal fun")
+     "Pedal to the metal fun")
     
     (:H3 "What it is")
     "Bind combines " (:em "let") ", " (:em "destructuring-bind") " and "
