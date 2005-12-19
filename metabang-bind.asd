@@ -34,7 +34,7 @@ DISCUSSION
 ;; try hard
 (unless (find-system 'asdf-system-connections nil)
  (when (find-package 'asdf-install)
-   (funcall (intern "INSTALL" "ASFD-INSTALL") 'asdf-system-connections)))
+   (funcall (intern "INSTALL" "ASDF-INSTALL") 'asdf-system-connections)))
 ;; give up with a useful (?) error message
 (unless (find-system 'asdf-system-connections nil)
   (error "The bind system requires ASDF-SYSTEM-CONNECTIONS. See 
@@ -49,7 +49,8 @@ instructions."))
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let* and destructuring-bind."
   :components ((:module "dev"
-	            :components ((:file "bind")))))
+	            :components ((:file "bind"))))
+  :depends-on (asdf-system-connections))
 
 ;;; ---------------------------------------------------------------------------
 
