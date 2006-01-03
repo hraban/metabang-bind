@@ -31,7 +31,7 @@ DISCUSSION
 |#
 (defpackage "METABANG.BIND"
     (:use "COMMON-LISP")
-    (:nicknames "BIND")
+    (:nicknames "BIND" "METABANG-BIND")
     (:export 
      #:bind
      #:fluid-bind))
