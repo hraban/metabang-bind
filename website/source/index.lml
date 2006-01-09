@@ -1,67 +1,67 @@
 ;;; -*- Mode: Lisp -*-
 
-(in-package #:lml2)
+(in-package rw)
 
 (html-file-page ("index")
   (html
    (:HEAD (:TITLE "metabang.bind")
-          ((:LINK :REL "stylesheet" :TYPE "text/css" :HREF "style.css"))
-          ((:META :HTTP-EQUIV "Content-Type" :CONTENT "text/html; charset=ISO-8859-1")))
+          (generate-shared-headers))
    (:BODY
-    ((:DIV :CLASS "header")
-     (:H1 "metabang.bind")
-     "Pedal to the metal fun")
+    (generate-two-line-header "metabang.bind" "Pedal to the metal fun")
     
-    (:H3 "What it is")
-    "Bind combines " (:em "let") ", " (:em "destructuring-bind") " and "
-    (:em "multiple-value-bind") " into a  single form. Simple bindings are as in "
-    (:em "let*") ". Destructuring is done if  the first item in a binding is a list. 
+    
+    ((:TABLE :CLASS "system-overview")
+     (:tr
+      (generate-system-sidebar)
+      
+      ((:TD :CLASS "system-description")
+       (:H3 "What it is")
+       "Bind combines " (:em "let") ", " (:em "destructuring-bind") " and "
+       (:em "multiple-value-bind") " into a  single form. Simple bindings are as in "
+       (:em "let*") ". Destructuring is done if  the first item in a binding is a list. 
 Multiple value binding is done if the first item in a binding is a list and the 
 first item in the list is 'values'."
-    
-    (:P "An example is probably the best way to describe its syntax:")
-    (:pre 
-     "(bind ((a 2)
+       
+       (:P "An example is probably the best way to describe its syntax:")
+       (:pre 
+        "(bind ((a 2)
        ((b &rest args &key (c 2) &allow-other-keys) '(:a :c 5 :d 10 :e 54))
        ((values d e) (truncate 4.5)))
   (list a b c d e args))
 ==> (2 :A 5 4 0.5 (:C 5 :D 10 :E 54))"
-     )
-    (:P "Bind is especially handy when you have more than one layer of 
+        )
+       (:P "Bind is especially handy when you have more than one layer of 
 multiple-value-bind or destructuring-bind. Since bind is a single form, 
 you don't end up too far off to the right in editor land.")
-    
-    (:P "Bind works by parsing the bindings and rewriting them as nested 
+       
+       (:P "Bind works by parsing the bindings and rewriting them as nested 
 let, multiple-value-bind and destructuring-bind forms. Bind handles
 declarations correctly -- putting each at the appropriate level.")
-    
-    (:P "Bind is released under the MIT license.")
-    
-    (:h3 "Mailing Lists")
-    (:P "metabang.bind isn't a separate project at this point but if you have
+       
+       (:P "Bind is released under the MIT license.")
+       
+       ((:A :NAME "mailing-lists")
+        (:h3 "Mailing Lists")
+        (:P "metabang.bind isn't a separate project at this point but if you have
 questions, comments or concerns, just drop " (rw:link :mail-gwking :title "Gary King")
-        " a line.")
+            " a line."))
+       
+       ((:A :NAME "downloads")
+        (:H3 "Where is it")
+        (:P "A " (rw:link :darcs) " repository is available. The commands are listed below:")
+        (:UL
+         (:LI "darcs get http://common-lisp.net/project/cl-containers/metabang.bind/darcs/metabang.bind"))
+        (:P "metabang.bind is also " (rw:link :asdf-install :title "ASDF installable") ". Its CLiki home is right " (rw:link :metabang-bind-cliki :title "where") " you'd expect.")
+        (:P "There's also a handy " (rw:link :metabang-bind-package :title "gzipped tar file") "."))
+       
+       ((:A :NAME "news")
+        (:H3 "What is happening")
+        ((:TABLE :BORDER "0") 
+         ((:TR :ALIGN "left" :VALIGN "top")
+          ((:TD :WIDTH "100px") "13 Nov 2005")
+          (:TD "Initial webpage n' stuff.")))))))
     
-    (:H3 "Where is it")
-    (:P "A " (rw:link :darcs) " repository is available. The commands are listed below:")
-    (:UL
-     (:LI "darcs get http://common-lisp.net/project/cl-containers/metabang.bind/darcs/metabang.bind"))
-    (:P "metabang.bind is also " (rw:link :asdf-install :title "ASDF installable") ". Its CLiki home is right " (rw:link :metabang.bind-cliki :title "where") " you'd expect.")
-    (:P "There's also a handy " (rw:link :metabang.bind-package :title "gzipped tar file") ".")
-    
-    (:H3 "What is happening")
-    (:P)
-    ((:TABLE :BORDER "0") 
-     ((:TR :ALIGN "left" :VALIGN "top")
-      ((:TD :WIDTH "100px") "13 Nov 2005")
-      (:TD "Initial webpage n' stuff.")))
-    
-    ((:DIV :CLASS "footer") 
-     "Last updated: " 
-     (lml-princ (metatilities:format-date "%A, %e %B %Y" (get-universal-time))))    
-    
-    ((:DIV :CLASS "common-lisp-link")
-     "Back to " ((:A :HREF "http://common-lisp.net/") "Common-lisp.net") ".")
-    
-    ((:DIV :CLASS "check")
-     ((:A :HREF "http://validator.w3.org/check/referer") "Valid XHTML 1.0 Strict")))))
+    ((:DIV :CLASS "footer")
+     (generate-button-row 
+      (format nil "Last updated: ~A" 
+              (format-date "%A, %e %B %Y" (get-universal-time))))))))
