@@ -49,7 +49,10 @@ instructions."))
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let* and destructuring-bind."
   :components ((:module "dev"
-	            :components ((:file "bind"))))
+	            :components ((:file "bind")))
+               (:module "website"
+                        :components ((:module "source"
+                                              :components ((:static-file "index.lml"))))))
   :depends-on (asdf-system-connections))
 
 ;;; ---------------------------------------------------------------------------
