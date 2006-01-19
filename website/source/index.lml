@@ -40,26 +40,25 @@ declarations correctly -- putting each at the appropriate level.")
        
        (:P "Bind is released under the MIT license.")
        
-       ((:A :NAME "mailing-lists")
+       ((:A :HREF "mailing-lists"))
         (:h3 "Mailing Lists")
         (:P "metabang.bind isn't a separate project at this point but if you have
 questions, comments or concerns, just drop " (rw:link :mail-gwking :title "Gary King")
-            " a line."))
+            " a line.")
        
-       ((:A :NAME "downloads")
+       ((:A :HREF "downloads"))
         (:H3 "Where is it")
         (:P "A " (rw:link :darcs) " repository is available. The commands are listed below:")
-        (:UL
-         (:LI "darcs get http://common-lisp.net/project/cl-containers/metabang.bind/darcs/metabang.bind"))
+        (:PRE "darcs get http://common-lisp.net/project/cl-containers/metabang.bind/darcs/metabang.bind")
         (:P "metabang.bind is also " (rw:link :asdf-install :title "ASDF installable") ". Its CLiki home is right " (rw:link :metabang-bind-cliki :title "where") " you'd expect.")
-        (:P "There's also a handy " (rw:link :metabang-bind-package :title "gzipped tar file") "."))
+        (:P "There's also a handy " (rw:link :metabang-bind-package :title "gzipped tar file") ".")
        
-       ((:A :NAME "news")
+       ((:A :HREF "news"))
         (:H3 "What is happening")
         ((:TABLE :BORDER "0") 
          ((:TR :ALIGN "left" :VALIGN "top")
-          ((:TD :WIDTH "100px") "13 Nov 2005")
-          (:TD "Initial webpage n' stuff.")))))))
+          ((:TD) "13 Nov 2005")
+          (:TD "Initial webpage n' stuff."))))))
     
     ((:DIV :CLASS "footer")
      (generate-button-row 
