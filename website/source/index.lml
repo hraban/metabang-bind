@@ -10,11 +10,10 @@
     (generate-two-line-header "metabang.bind" "Pedal to the metal fun")
     
     
-    ((:TABLE :CLASS "system-overview")
-     (:tr
-      (generate-system-sidebar)
-      
-      ((:TD :CLASS "system-description")
+    ((:DIV :CLASS "contents")
+     (generate-system-sidebar)
+     
+     ((:DIV :CLASS "system-description")
        (:H3 "What it is")
        "Bind combines " (:em "let") ", " (:em "destructuring-bind") " and "
        (:em "multiple-value-bind") " into a  single form. Simple bindings are as in "
@@ -58,7 +57,7 @@ questions, comments or concerns, just drop " (rw:link :mail-gwking :title "Gary 
         ((:TABLE :BORDER "0") 
          ((:TR :ALIGN "left" :VALIGN "top")
           ((:TD) "13 Nov 2005")
-          (:TD "Initial webpage n' stuff."))))))
+          (:TD "Initial webpage n' stuff.")))))
     
     ((:DIV :CLASS "footer")
      (generate-button-row 
