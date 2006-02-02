@@ -61,6 +61,8 @@ instructions."))
   :requires (metabang-bind metatilities-base)
   :perform (load-op :after (op c)
                     (use-package (find-package "METABANG.BIND") 
-                                 (find-package "METATILITIES")))) 
+                                 (find-package "METATILITIES"))
+                    (funcall (intern "EXPORT-EXPORTED-SYMBOLS" "METATILITIES")
+                             "BIND" "METATILITIES"))) 
 
 
