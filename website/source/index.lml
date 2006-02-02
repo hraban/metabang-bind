@@ -54,9 +54,9 @@ questions, comments or concerns, just drop " (rw:link :mail-gwking :title "Gary 
        
        ((:A :NAME "news"))
         (:H3 "What is happening")
-        ((:TABLE :BORDER "0") 
-         ((:TR :ALIGN "left" :VALIGN "top")
-          ((:TD) "13 Nov 2005")
+        ((:TABLE :CLASS "system-news") 
+         (:TR
+          (:TH "13 Nov 2005")
           (:TD "Initial webpage n' stuff.")))))
     
     ((:DIV :CLASS "footer")
