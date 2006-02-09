@@ -103,9 +103,12 @@ in a binding is a list and the first item in the list is 'values'."
                    ,(bind-filter-declarations declarations (rest variable-form))
                    ,@(bind-macro-helper remaining-bindings declarations body)))))
             ((consp variable-form)
-             `((destructuring-bind ,variable-form ,value-form
-                 ,(bind-filter-declarations declarations variable-form)
-                 ,@(bind-macro-helper remaining-bindings declarations body))))
+             (multiple-value-bind (vars ignores)
+                                  (bind-fix-nils variable-form)
+               `((destructuring-bind ,vars ,value-form
+                   ,@(when ignores `((declare (ignore ,@ignores))))
+                   ,(bind-filter-declarations declarations variable-form)
+                   ,@(bind-macro-helper remaining-bindings declarations body)))))
             (t
              `((let (,@(if value-form
                          `((,variable-form ,value-form))
