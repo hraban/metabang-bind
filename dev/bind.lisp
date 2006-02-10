@@ -104,7 +104,7 @@ in a binding is a list and the first item in the list is 'values'."
                    ,@(bind-macro-helper remaining-bindings declarations body)))))
             ((consp variable-form)
              (multiple-value-bind (vars ignores)
-                                  (bind-fix-nils variable-form)
+                                  (bind-fix-nils-destructured variable-form)
                `((destructuring-bind ,vars ,value-form
                    ,@(when ignores `((declare (ignore ,@ignores))))
                    ,(bind-filter-declarations declarations variable-form)
@@ -126,6 +126,28 @@ in a binding is a list and the first item in the list is 'values'."
                 (t (let ((ignore (gensym "BIND-IGNORE-")))
                      (push ignore vars)
                      (push ignore ignores)))))
+    (values (nreverse vars) ignores)))
+
+;;; ---------------------------------------------------------------------------
+
+(defun bind-fix-nils-destructured (var-list)
+  (let (vars ignores)
+    (labels (;; from metatilities
+             (dotted-pair-p (putative-pair)
+               (and (consp putative-pair)
+                    (cdr putative-pair)
+                    (not (consp (cdr putative-pair)))))
+             (rec (var)
+               (cond ((atom var)
+                      (cond (var (push var vars))
+                            (t (let ((ignore (gensym "BIND-IGNORE-")))
+                                 (push ignore vars)
+                                 (push ignore ignores)))))
+                     (t
+                      (rec (car var)) 
+                      (rec (cdr var))))))
+      (rec var-list))
+    
     (values (nreverse vars) ignores)))
 
 ;;; ---------------------------------------------------------------------------
