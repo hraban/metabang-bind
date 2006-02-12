@@ -42,7 +42,12 @@ DISCUSSION
     (:use "COMMON-LISP")
     (:export 
      #:bind
-     #:fluid-bind)))
+     #:fluid-bind
+     
+     #:bind-error
+     #:bind-keyword/optional-nil-with-default-error
+     #:bad-variable
+     #:binding)))
 
 (in-package metabang.bind)
            
@@ -59,6 +64,19 @@ DISCUSSION
 (defparameter *bind-simple-var-declarations*
   (remove 'type
           (set-difference *bind-all-declarations* *bind-non-var-declarations*)))
+
+;;; ---------------------------------------------------------------------------
+
+(define-condition bind-error (error)
+                  ((binding :initform nil :initarg :binding :reader binding)))
+
+;;; ---------------------------------------------------------------------------
+
+(define-condition bind-keyword/optional-nil-with-default-error (bind-error)
+                  ((bad-variable :initform nil :initarg :bad-variable :reader bad-variable))
+  (:report (lambda (c s)
+             (format s "Bad binding '~S' in '~A'; cannot use a default value for &key or &optional arguments."
+                     (bad-variable c) (binding c)))))
 
 ;;; ---------------------------------------------------------------------------
 
@@ -131,24 +149,26 @@ in a binding is a list and the first item in the list is 'values'."
 ;;; ---------------------------------------------------------------------------
 
 (defun bind-fix-nils-destructured (var-list)
-  (let (vars ignores)
-    (labels (;; from metatilities
-             (dotted-pair-p (putative-pair)
-               (and (consp putative-pair)
-                    (cdr putative-pair)
-                    (not (consp (cdr putative-pair)))))
-             (rec (var)
-               (cond ((atom var)
-                      (cond (var (push var vars))
-                            (t (let ((ignore (gensym "BIND-IGNORE-")))
-                                 (push ignore vars)
-                                 (push ignore ignores)))))
-                     (t
-                      (rec (car var)) 
-                      (rec (cdr var))))))
-      (rec var-list))
-    
-    (values (nreverse vars) ignores)))
+  (let ((ignores nil))
+    (labels (;; adapted from metatilities 
+             (tree-map (fn tree)
+               "Maps FN over every atom in TREE."
+               (cond
+                ;; ((null tree) nil)
+                ((atom tree) (funcall fn tree))
+                (t
+                 (cons
+                  (tree-map fn (car tree))
+                  (when (cdr tree) (tree-map fn (cdr tree))))))))
+      
+      (values (tree-map
+               (lambda (x)
+                 (cond (x x)
+                       (t (let ((ignore (gensym "BIND-IGNORE-")))
+                            (push ignore ignores)
+                            ignore))))
+               var-list)
+              ignores))))
 
 ;;; ---------------------------------------------------------------------------
 
