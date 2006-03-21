@@ -60,9 +60,12 @@ instructions."))
 (asdf:defsystem-connection bind-and-metatilities
   :requires (metabang-bind metatilities-base)
   :perform (load-op :after (op c)
-                    (use-package (find-package "METABANG.BIND") 
-                                 (find-package "METATILITIES"))
-                    (funcall (intern "EXPORT-EXPORTED-SYMBOLS" "METATILITIES")
-                             "BIND" "METATILITIES"))) 
+                    (use-package (find-package 'metabang.bind) 
+                                 (find-package 'metatilities))
+                    (funcall (intern 
+                              (if (eq 'a 'A) 
+                                "EXPORT-EXPORTED-SYMBOLS" "export-exported-symbols")
+                              'metatilities)
+                             'bind 'metatilities))) 
 
 

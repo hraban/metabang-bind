@@ -1,6 +1,6 @@
 (in-package common-lisp-user)
 
-(defpackage "METABANG-BIND-TEST"
-  (:use "COMMON-LISP" "LIFT" "METABANG-BIND")
-  (:import-from "METABANG-BIND"
+(defpackage #:metabang-bind-test
+  (:use #:common-lisp #:lift #:metabang-bind)
+  (:import-from #:metabang-bind
                 #:bind-fix-nils-destructured))

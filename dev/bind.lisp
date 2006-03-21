@@ -29,9 +29,9 @@ Author: Gary King
 DISCUSSION
 
 |#
-(defpackage "METABANG.BIND"
-    (:use "COMMON-LISP")
-    (:nicknames "BIND" "METABANG-BIND")
+(defpackage #:metabang.bind
+    (:use #:common-lisp)
+    (:nicknames #:bind #:metabang-bind)
     (:export 
      #:bind
      #:fluid-bind))
@@ -49,7 +49,7 @@ DISCUSSION
      #:bad-variable
      #:binding)))
 
-(in-package metabang.bind)
+(in-package metabang.bind) 
            
 (defparameter *bind-all-declarations*
   '(dynamic-extent ignore optimize ftype inline special ignorable notinline type))
@@ -212,6 +212,14 @@ in a binding is a list and the first item in the list is 'values'."
 ;;; ---------------------------------------------------------------------------
 
 (defmacro fluid-bind ((&rest bindings) &body body)
+  "Fluid-bind is an extension of bind that handles setting and resetting places. For example, suppose that an object of class foo has a slot named bar whose value is currently 3. The following code would evaluate the inner body with bar bound to 17 and restore it when the inner body is exited. 
+
+\(fluid-bind \(\(\(bar foo\) 17\)\)
+  \(print \(bar foo\)\)\)
+\(print \(bar foo\)\)
+==> \(prints 17, then 3\)
+
+This is similar to dynamic-binding but _much_ less robust."
   ;; does not handle declarations correctly
   (let ((setup-forms nil)
         (cleanup-forms nil)
