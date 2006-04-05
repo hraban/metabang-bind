@@ -4,10 +4,10 @@
 
 (html-file-page ("index")
   (html
-   (:HEAD (:TITLE "metabang.bind")
+   (:HEAD (:TITLE "metabang-bind")
           (generate-shared-headers))
    (:BODY
-    (generate-two-line-header "metabang.bind" "Pedal to the metal fun")
+    (generate-two-line-header "metabang-bind" "Pedal to the metal fun")
     
     
     ((:DIV :CLASS "contents")
@@ -41,15 +41,15 @@ declarations correctly -- putting each at the appropriate level.")
        
        ((:A :NAME "mailing-lists"))
         (:h3 "Mailing Lists")
-        (:P "metabang.bind isn't a separate project at this point but if you have
+        (:P "metabang-bind isn't a separate project at this point but if you have
 questions, comments or concerns, just drop " (rw:link :mail-gwking :title "Gary King")
             " a line.")
        
        ((:A :NAME "downloads"))
         (:H3 "Where is it")
         (:P "A " (rw:link :darcs) " repository is available. The commands are listed below:")
-        (:PRE "darcs get http://common-lisp.net/project/cl-containers/metabang.bind/darcs/metabang.bind")
-        (:P "metabang.bind is also " (rw:link :asdf-install :title "ASDF installable") ". Its CLiki home is right " (rw:link :metabang-bind-cliki :title "where") " you'd expect.")
+        (:PRE "darcs get http://common-lisp.net/project/cl-containers/metabang-bind/darcs/metabang-bind")
+        (:P "metabang-bind is also " (rw:link :asdf-install :title "ASDF installable") ". Its CLiki home is right " (rw:link :metabang-bind-cliki :title "where") " you'd expect.")
         (:P "There's also a handy " (rw:link :metabang-bind-package :title "gzipped tar file") ".")
        
        ((:A :NAME "news"))
