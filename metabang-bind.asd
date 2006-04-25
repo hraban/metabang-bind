@@ -28,16 +28,16 @@ DISCUSSION
 
 |#
 
-(defpackage "METABANG.BIND-SYSTEM" (:use #:cl #:asdf))
-(in-package "METABANG.BIND-SYSTEM")
+(defpackage #:metabang.bind-system (:use #:cl #:asdf))
+(in-package #:metabang.bind-system)
 
 ;; try hard
 (unless (find-system 'asdf-system-connections nil)
  (when (find-package 'asdf-install)
-   (funcall (intern "INSTALL" "ASDF-INSTALL") 'asdf-system-connections)))
+   (funcall (intern (symbol-name :install) :asdf-install) 'asdf-system-connections)))
 ;; give up with a useful (?) error message
 (unless (find-system 'asdf-system-connections nil)
-  (error "The bind system requires ASDF-SYSTEM-CONNECTIONS. See 
+  (error "The bind system requires ASDF-system-connections. See 
 http://www.cliki.net/asdf-system-connections for details and download
 instructions."))
 
@@ -63,8 +63,7 @@ instructions."))
                     (use-package (find-package 'metabang.bind) 
                                  (find-package 'metatilities))
                     (funcall (intern 
-                              (if (eq 'a 'A) 
-                                "EXPORT-EXPORTED-SYMBOLS" "export-exported-symbols")
+                              (symbol-name :export-exported-symbols)
                               'metatilities)
                              'bind 'metatilities))) 
 
