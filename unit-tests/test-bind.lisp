@@ -1,4 +1,4 @@
-(in-package metabang-bind-test)
+(in-package #:metabang-bind-test)
 
 (deftestsuite test-bind () ())
 

@@ -49,7 +49,7 @@ DISCUSSION
      #:bad-variable
      #:binding)))
 
-(in-package metabang.bind) 
+(in-package #:metabang.bind) 
            
 (defparameter *bind-all-declarations*
   '(dynamic-extent ignore optimize ftype inline special ignorable notinline type))

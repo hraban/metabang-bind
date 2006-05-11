@@ -1,4 +1,4 @@
-(in-package common-lisp-user)
+(in-package #:common-lisp-user)
 
 (defpackage #:metabang-bind-test
   (:use #:common-lisp #:lift #:metabang-bind)
