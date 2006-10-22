@@ -13,8 +13,7 @@
 http://www.cliki.net/asdf-system-connections for details and download
 instructions."))
 
-(when (find-system 'asdf-system-connections nil)
-  (asdf:operate 'asdf:load-op 'asdf-system-connections))
+(asdf:operate 'asdf:load-op 'asdf-system-connections)
 
 (defsystem metabang-bind
   :version "0.2"
@@ -28,15 +27,23 @@ instructions."))
                                               :components ((:static-file "index.lml"))))))
   :depends-on (#+asdf-system-connections asdf-system-connections))
 
-#+asdf-system-connections 
 (asdf:defsystem-connection bind-and-metatilities
   :requires (metabang-bind metatilities-base)
   :perform (load-op :after (op c)
-                    (use-package (find-package 'metabang.bind) 
-                                 (find-package 'metatilities))
-                    (funcall (intern 
-                              (symbol-name :export-exported-symbols)
-                              'metatilities)
-                             'bind 'metatilities))) 
+                    (use-package (find-package '#:metabang.bind)
+                                 (find-package '#:metatilities))
+                    (eval (let ((*package* (find-package :common-lisp)))
+                            (read-from-string
+                             "(progn
+                                (metatilities:export-exported-symbols '#:bind '#:metatilities)
+                                (when (eq metabang.bind:*defclass-macro-name-for-dynamic-context* 'cl:defclass)
+                                  (setf metabang.bind:*defclass-macro-name-for-dynamic-context* 'metatilities:defclass*)))")))))
 
-
+(defsystem-connection bind-and-metatilities
+  :requires (metabang-bind defclass-star)
+  :perform (load-op :after (op c)
+                    (eval (let ((*package* (find-package :common-lisp)))
+                            (read-from-string
+                             "(progn
+                                (when (member metabang.bind:*defclass-macro-name-for-dynamic-context* '(defclass metatilities:defclass*))
+                                  (setf metabang.bind:*defclass-macro-name-for-dynamic-context* 'defclass-star:defclass*)))")))))
