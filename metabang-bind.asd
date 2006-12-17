@@ -9,14 +9,15 @@
 ;; give up with a useful (?) error message
 (unless (find-system 'asdf-system-connections nil)
   (terpri)
-  (print ";; Warning: The bind system requires ASDF-system-connections. See 
+  (format t "~&;; Warning: The bind system requires ASDF-system-connections. See 
 http://www.cliki.net/asdf-system-connections for details and download
 instructions."))
 
-(asdf:operate 'asdf:load-op 'asdf-system-connections)
+(when (find-system 'asdf-system-connections nil)
+  (asdf:operate 'asdf:load-op 'asdf-system-connections))
 
 (defsystem metabang-bind
-  :version "0.2"
+  :version "0.2.1"
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let* and destructuring-bind."
@@ -25,9 +26,15 @@ instructions."))
                (:module "website"
                         :components ((:module "source"
                                               :components ((:static-file "index.lml"))))))
+  :in-order-to ((test-op (load-op metabang-bind-test)))
+  :perform (test-op :after (op c)
+                    (describe 
+		     (funcall (intern (symbol-name '#:run-tests) :lift) 
+			      :suite '#:metabang-bind-test)))
   :depends-on (#+asdf-system-connections asdf-system-connections))
 
-(asdf:defsystem-connection bind-and-metatilities
+#+asdf-system-connections 
+(defsystem-connection bind-and-metatilities
   :requires (metabang-bind metatilities-base)
   :perform (load-op :after (op c)
                     (use-package (find-package '#:metabang.bind)
@@ -39,6 +46,7 @@ instructions."))
                                 (when (eq metabang.bind:*defclass-macro-name-for-dynamic-context* 'cl:defclass)
                                   (setf metabang.bind:*defclass-macro-name-for-dynamic-context* 'metatilities:defclass*)))")))))
 
+#+asdf-system-connections 
 (defsystem-connection bind-and-metatilities
   :requires (metabang-bind defclass-star)
   :perform (load-op :after (op c)
