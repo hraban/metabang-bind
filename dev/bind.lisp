@@ -320,7 +320,8 @@ This is similar to dynamic-binding but _much_ less robust."
         ,(when export-symbols
                `(export (list ',extractor-name
                          ',with-new-macro-name
-                         ',with-macro-name)))
+                         ',with-macro-name
+                         ',(concatenate-symbol "in-" name))))
         ;; generate the context class definition
         ,(when create-class
                `(,defclass-macro-name ,class-name ,direct-superclasses
@@ -370,12 +371,12 @@ This is similar to dynamic-binding but _much_ less robust."
                     (error ,',(strcat "There's no " (string-downcase name))))
                   ,@forms))))
         ;; generate the current-... function
+        (declaim (inline ,extractor-name))
         (defun ,extractor-name ()
-          (declare (inline))
           (symbol-value ',special-var-name))
         ;; generate the has-... function
+        (declaim (inline ,has-checker-name))
         (defun ,has-checker-name ()
-          (declare (inline))
           (boundp ',special-var-name))))))
 
 #|
