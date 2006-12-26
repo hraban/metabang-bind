@@ -57,23 +57,19 @@ DISCUSSION
 (defparameter *bind-all-declarations*
   '(dynamic-extent ignore optimize ftype inline special ignorable notinline type))
 
-;;; ---------------------------------------------------------------------------
-
 (defparameter *bind-non-var-declarations*
   '(optimize ftype inline notinline))
-
-;;; ---------------------------------------------------------------------------
 
 (defparameter *bind-simple-var-declarations*
   (remove 'type
           (set-difference *bind-all-declarations* *bind-non-var-declarations*)))
 
-;;; ---------------------------------------------------------------------------
+
+(defparameter *lambda-list-markers* 
+  '(&key &body &rest &args &optional))
 
 (define-condition bind-error (error)
                   ((binding :initform nil :initarg :binding :reader binding)))
-
-;;; ---------------------------------------------------------------------------
 
 (define-condition bind-keyword/optional-nil-with-default-error (bind-error)
                   ((bad-variable :initform nil :initarg :bad-variable :reader bad-variable))
@@ -81,16 +77,14 @@ DISCUSSION
              (format s "Bad binding '~S' in '~A'; cannot use a default value for &key or &optional arguments."
                      (bad-variable c) (binding c)))))
 
-;;; ---------------------------------------------------------------------------
-
 (defmacro bind ((&rest bindings) &body body)
   "Bind is a replacement for let*, destructuring-bind and multiple-value-bind.
 An example is probably the best way to describe its syntax:
 
-\(bind \(\(a 2\)
-       \(\(b &rest args &key \(c 2\) &allow-other-keys\) '\(:a :c 5 :d 10 :e 54\)\)
-       \(\(values d e\) \(truncate 4.5\)\)\)
-  \(list a b c d e args\)\)
+    \(bind \(\(a 2\)
+           \(\(b &rest args &key \(c 2\) &allow-other-keys\) '\(:a :c 5 :d 10 :e 54\)\)
+           \(\(values d e\) \(truncate 4.5\)\)\)
+      \(list a b c d e args\)\)
 
 Simple bindings are as in let*. Destructuring is done if the first item
 in a binding is a list. Multiple value binding is done if the first item
@@ -103,8 +97,6 @@ in a binding is a list and the first item in the list is 'values'."
             bindings 
             (bind-expand-declarations (nreverse declarations)) body))))
 
-;;; ---------------------------------------------------------------------------
-
 (defun bind-macro-helper (bindings declarations body)
   (if bindings
     (let ((binding (first bindings))
@@ -116,7 +108,8 @@ in a binding is a list and the first item in the list is 'values'."
         (setf variable-form binding))
       
       (cond ((and (consp variable-form)
-                  (eq (first variable-form) 'cl:values))
+                  (or (eq (first variable-form) 'cl:values)
+		      (eq (first variable-form) ':values)))
              (multiple-value-bind (vars ignores)
                                   (bind-fix-nils (rest variable-form))
                `((multiple-value-bind ,vars ,value-form
@@ -138,8 +131,6 @@ in a binding is a list and the first item in the list is 'values'."
                  ,@(bind-macro-helper remaining-bindings declarations body))))))
     body))
 
-;;; ---------------------------------------------------------------------------
-
 (defun bind-fix-nils (var-list)
   (let (vars ignores)
     (loop for v in var-list do
@@ -148,8 +139,6 @@ in a binding is a list and the first item in the list is 'values'."
                      (push ignore vars)
                      (push ignore ignores)))))
     (values (nreverse vars) ignores)))
-
-;;; ---------------------------------------------------------------------------
 
 (defun bind-fix-nils-destructured (var-list)
   (let ((ignores nil))
@@ -173,7 +162,10 @@ in a binding is a list and the first item in the list is 'values'."
                var-list)
               ignores))))
 
-;;; ---------------------------------------------------------------------------
+(defun bind-get-vars-from-lambda-list (lambda-list)
+  (loop for item in lambda-list 
+       unless (member item *lambda-list-markers*) collect
+       (if (consp item) (first item) item)))
 
 (defun bind-expand-declarations (declarations)
   (loop for declaration in declarations append
@@ -193,11 +185,9 @@ in a binding is a list and the first item in the list is 'values'."
                      (loop for var in (rest decl) collect
                            `(type ,(first decl) ,var)))))))
 
-;;; ---------------------------------------------------------------------------
-
 (defun bind-filter-declarations (declarations var-names)
   (setf var-names (if (consp var-names) var-names (list var-names)))
-  
+  (setf var-names (bind-get-vars-from-lambda-list var-names))  
   ;; each declaration is separate
   (let ((declaration
          (loop for declaration in declarations 
@@ -269,11 +259,12 @@ This is similar to dynamic-binding but _much_ less robust."
 
 (defvar *defclass-macro-name-for-dynamic-context* 'defclass)
 
-(defmacro define-dynamic-context (name direct-slots &key direct-superclasses
-                                       export-symbols (class-name name) chain-parents
-                                       (create-struct nil) (create-class (not create-struct))
-                                       struct-options
-                                       (defclass-macro-name *defclass-macro-name-for-dynamic-context*))
+(defmacro define-dynamic-context 
+    (name direct-slots &key direct-superclasses
+     export-symbols (class-name name) chain-parents
+     (create-struct nil) (create-class (not create-struct))
+     struct-options
+     (defclass-macro-name *defclass-macro-name-for-dynamic-context*))
   "This macro generates with-NAME/in-NAME/current-NAME/has-NAME macros to access a CLOS instance in a special variable.
    The purpose is to provide an easy way to access a group of related cotextual values."
   (assert (and (or create-class
@@ -412,7 +403,4 @@ This is similar to dynamic-binding but _much_ less robust."
   (+ a a))
 |#
 
-;;; ***************************************************************************
-;;; *                              End of File                                *
-;;; ***************************************************************************
 

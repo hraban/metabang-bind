@@ -17,7 +17,7 @@ instructions."))
   (asdf:operate 'asdf:load-op 'asdf-system-connections))
 
 (defsystem metabang-bind
-  :version "0.2.1"
+  :version "0.2.2"
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let* and destructuring-bind."
