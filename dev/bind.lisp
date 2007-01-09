@@ -265,8 +265,8 @@ This is similar to dynamic-binding but _much_ less robust."
      (create-struct nil) (create-class (not create-struct))
      struct-options
      (defclass-macro-name *defclass-macro-name-for-dynamic-context*))
-  "This macro generates with-NAME/in-NAME/current-NAME/has-NAME macros to access a CLOS instance in a special variable.
-   The purpose is to provide an easy way to access a group of related cotextual values."
+  "This macro generates with-NAME/in-NAME/current-NAME/has-NAME macros to access a CLOS instance or a struct in a special variable.
+   The purpose is to provide an easy way to access a group of related cotextual values optionally chaining the older values (with 'parent-context-of) when needed."
   (assert (and (or create-class
                    create-struct
                    (not (or direct-slots direct-superclasses chain-parents)))
@@ -358,8 +358,6 @@ This is similar to dynamic-binding but _much_ less robust."
                 `(with-slots ,slots (,',extractor-name)
                   ,@forms)
                 `(let ((,var-name-or-slot-name-list (,',extractor-name)))
-                  (unless ,var-name-or-slot-name-list
-                    (error ,',(strcat "There's no " (string-downcase name))))
                   ,@forms))))
         ;; generate the current-... function
         (declaim (inline ,extractor-name))
