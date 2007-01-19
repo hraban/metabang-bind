@@ -17,7 +17,7 @@ instructions."))
   (asdf:operate 'asdf:load-op 'asdf-system-connections))
 
 (defsystem metabang-bind
-  :version "0.2.2"
+  :version "0.2.3"
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let* and destructuring-bind."
@@ -47,7 +47,7 @@ instructions."))
                                   (setf metabang.bind:*defclass-macro-name-for-dynamic-context* 'metatilities:defclass*)))")))))
 
 #+asdf-system-connections 
-(defsystem-connection bind-and-metatilities
+(defsystem-connection bind-and-defclass-star
   :requires (metabang-bind defclass-star)
   :perform (load-op :after (op c)
                     (eval (let ((*package* (find-package :common-lisp-user)))
