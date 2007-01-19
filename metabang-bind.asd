@@ -47,7 +47,7 @@ instructions."))
                                   (setf metabang.bind:*defclass-macro-name-for-dynamic-context* 'metatilities:defclass*)))")))))
 
 #+asdf-system-connections 
-(defsystem-connection bind-and-metatilities
+(defsystem-connection bind-and-defclass-star
   :requires (metabang-bind defclass-star)
   :perform (load-op :after (op c)
                     (eval (let ((*package* (find-package :common-lisp)))
