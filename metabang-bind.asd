@@ -33,13 +33,13 @@ instructions."))
 			      :suite '#:metabang-bind-test)))
   :depends-on (#+asdf-system-connections asdf-system-connections))
 
-#+asdf-system-connections 
+#+asdf-system-connections
 (defsystem-connection bind-and-metatilities
   :requires (metabang-bind metatilities-base)
   :perform (load-op :after (op c)
                     (use-package (find-package '#:metabang.bind)
                                  (find-package '#:metatilities))
-                    (eval (let ((*package* (find-package :common-lisp)))
+                    (eval (let ((*package* (find-package :common-lisp-user)))
                             (read-from-string
                              "(progn
                                 (metatilities:export-exported-symbols '#:bind '#:metatilities)
@@ -47,11 +47,12 @@ instructions."))
                                   (setf metabang.bind:*defclass-macro-name-for-dynamic-context* 'metatilities:defclass*)))")))))
 
 #+asdf-system-connections 
-(defsystem-connection bind-and-defclass-star
+(defsystem-connection bind-and-metatilities
   :requires (metabang-bind defclass-star)
   :perform (load-op :after (op c)
-                    (eval (let ((*package* (find-package :common-lisp)))
+                    (eval (let ((*package* (find-package :common-lisp-user)))
                             (read-from-string
-                             "(progn
-                                (when (member metabang.bind:*defclass-macro-name-for-dynamic-context* '(defclass metatilities:defclass*))
+                             "(let ((home-package (symbol-package metabang.bind:*defclass-macro-name-for-dynamic-context*)))
+                                (when (or (eq home-package (find-package :common-lisp))
+                                          (eq home-package (find-package '#:metatilities)))
                                   (setf metabang.bind:*defclass-macro-name-for-dynamic-context* 'defclass-star:defclass*)))")))))

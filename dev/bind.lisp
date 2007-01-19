@@ -352,8 +352,8 @@ This is similar to dynamic-binding but _much_ less robust."
               ,@forms)))
         ;; generate the in-... macro
         (defmacro ,(concatenate-symbol "in-" name) (var-name-or-slot-name-list &body forms)
-          (bind ((slots (when (listp var-name-or-slot-name-list)
-                          var-name-or-slot-name-list)))
+          (let ((slots (when (listp var-name-or-slot-name-list)
+                         var-name-or-slot-name-list)))
             (if slots
                 `(with-slots ,slots (,',extractor-name)
                   ,@forms)
