@@ -39,7 +39,7 @@
   :perform (load-op :after (op c)
                     (use-package (find-package '#:metabang.bind)
                                  (find-package '#:metatilities))
-                    (eval (let ((*package* (find-package :common-lisp-user)))
+                    (eval (let ((*package* (find-package '#:metabang.bind-system)))
                             (read-from-string
                              "(progn
                                 (metatilities:export-exported-symbols '#:bind '#:metatilities)
@@ -50,7 +50,7 @@
 (defsystem-connection bind-and-defclass-star
   :requires (metabang-bind defclass-star)
   :perform (load-op :after (op c)
-                    (eval (let ((*package* (find-package :common-lisp-user)))
+                    (eval (let ((*package* (find-package '#:metabang.bind-system)))
                             (read-from-string
                              "(let ((home-package (symbol-package metabang.bind:*defclass-macro-name-for-dynamic-context*)))
                                 (when (or (eq home-package (find-package :common-lisp))
