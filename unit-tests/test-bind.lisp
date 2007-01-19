@@ -73,3 +73,28 @@
     (ensure-same (length ignores) 0)
     (ensure-same vars '(a b &key (c 1) d (e x y)
                         &allow-other-keys) :test #'equal)))
+
+;;;;;
+
+(deftestsuite bind-get-vars-from-lambda-list (metabang-bind-test)
+  ()
+  :equality-test #'equal)
+
+(addtest (bind-get-vars-from-lambda-list)
+  test-1
+  (ensure-same (bind-get-vars-from-lambda-list 
+		'(a b &key (c 1))) '(a b c)))
+
+;; Jonathan McKitrick's example
+(addtest (bind-get-vars-from-lambda-list)
+  test-2
+  (ensure-same (bind-get-vars-from-lambda-list 
+		'((item arg1 arg2 &rest rest1) &rest rest2))
+	       '(item arg1 arg2 rest1 rest2)))
+
+;; Chris Dean's example
+(addtest (bind-get-vars-from-lambda-list)
+  test-2
+  (ensure-same (bind-get-vars-from-lambda-list 
+		'(a &optional (b 0)))
+	       '(a b)))
