@@ -39,23 +39,11 @@ DISCUSSION
      #:*defclass-macro-name-for-dynamic-context*
      #:parent-context-of))
 
-#+NO
-(unless (find-package "BIND")
-  (defpackage "BIND"
-    (:use "COMMON-LISP")
-    (:export 
-     #:bind
-     #:fluid-bind
-     
-     #:bind-error
-     #:bind-keyword/optional-nil-with-default-error
-     #:bad-variable
-     #:binding)))
-
 (in-package #:metabang.bind) 
            
 (defparameter *bind-all-declarations*
-  '(dynamic-extent ignore optimize ftype inline special ignorable notinline type))
+  '(dynamic-extent ignore optimize ftype inline special 
+    ignorable notinline type))
 
 (defparameter *bind-non-var-declarations*
   '(optimize ftype inline notinline))
@@ -72,7 +60,7 @@ DISCUSSION
                   ((binding :initform nil :initarg :binding :reader binding)))
 
 (define-condition bind-keyword/optional-nil-with-default-error (bind-error)
-                  ((bad-variable :initform nil :initarg :bad-variable :reader bad-variable))
+  ((bad-variable :initform nil :initarg :bad-variable :reader bad-variable))
   (:report (lambda (c s)
              (format s "Bad binding '~S' in '~A'; cannot use a default value for &key or &optional arguments."
                      (bad-variable c) (binding c)))))
@@ -162,10 +150,34 @@ in a binding is a list and the first item in the list is 'values'."
                var-list)
               ignores))))
 
+(defun dotted-pair-p (putative-pair)
+  "Returns true if and only if `putative-pair` is a dotted-list. I.e., if `putative-pair` is a cons cell with a non-nil cdr."
+  (and (consp putative-pair)
+       (cdr putative-pair)
+       (not (consp (cdr putative-pair)))))
+
 (defun bind-get-vars-from-lambda-list (lambda-list)
-  (loop for item in lambda-list 
-       unless (member item *lambda-list-markers*) collect
-       (if (consp item) (first item) item)))
+  (let ((result nil))
+    (labels ((do-it (thing doing-defaults?)
+	       (cond ((atom thing) 
+		      (unless (or (member thing *lambda-list-markers*)
+				  (null thing))
+			(push thing result)))
+		     ((dotted-pair-p thing)
+		      (do-it (car thing) doing-defaults?) 
+		      (do-it (cdr thing) doing-defaults?))
+		     (t
+		      (dolist (it thing)
+			(cond ((member it '(&optional &key))
+			       (setf doing-defaults? t))
+			      ((consp it)
+			       (if doing-defaults? 
+				   (do-it (first it) nil)
+				   (do-it it nil)))
+			      (t
+			       (do-it it nil))))))))
+      (do-it lambda-list nil))
+    (nreverse result)))
 
 (defun bind-expand-declarations (declarations)
   (loop for declaration in declarations append
