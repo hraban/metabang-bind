@@ -1,20 +1,20 @@
 (defpackage #:metabang.bind-system (:use #:cl #:asdf))
 (in-package #:metabang.bind-system)
 
-;; try hard
-(unless (find-system 'asdf-system-connections nil)
- (when (find-package 'asdf-install)
-   (funcall (intern (symbol-name :install) :asdf-install)
-   	     'asdf-system-connections)))
-;; give up with a useful (?) error message
-(unless (find-system 'asdf-system-connections nil)
-  (terpri)
-  (format t "~&;; Warning: The bind system requires ASDF-system-connections. See 
-http://www.cliki.net/asdf-system-connections for details and download
-instructions."))
-
-(when (find-system 'asdf-system-connections nil)
-  (asdf:operate 'asdf:load-op 'asdf-system-connections))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  ;; try hard
+  (unless (find-system 'asdf-system-connections nil)
+    (when (find-package 'asdf-install)
+      (funcall (intern (symbol-name :install) :asdf-install)
+               'asdf-system-connections)))
+  ;; give up with a useful (?) error message
+  (if (find-system 'asdf-system-connections nil)
+      (asdf:operate 'asdf:load-op 'asdf-system-connections)
+      (progn
+        (terpri)
+        (format t "~&;; Warning: The bind system requires ASDF-system-connections. See~%~
+               http://www.cliki.net/asdf-system-connections for details and download~%~
+               instructions."))))
 
 (defsystem metabang-bind
   :version "0.2.3"
