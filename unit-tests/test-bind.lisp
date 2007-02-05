@@ -81,6 +81,16 @@
   :equality-test #'equal)
 
 (addtest (bind-get-vars-from-lambda-list)
+  simple-1
+  (ensure-same (bind-get-vars-from-lambda-list 
+		'(a b c)) '(a b c)))
+
+(addtest (bind-get-vars-from-lambda-list)
+  simple-2
+  (ensure-same (bind-get-vars-from-lambda-list 
+		'(a b c &rest args)) '(a b c args)))
+
+(addtest (bind-get-vars-from-lambda-list)
   test-1
   (ensure-same (bind-get-vars-from-lambda-list 
 		'(a b &key (c 1))) '(a b c)))
@@ -95,6 +105,7 @@
 ;; Chris Dean's example
 (addtest (bind-get-vars-from-lambda-list)
   test-2
-  (ensure-same (bind-get-vars-from-lambda-list 
+  (ensure-same (bind::bind-get-vars-from-lambda-list 
 		'(a &optional (b 0)))
 	       '(a b)))
+
