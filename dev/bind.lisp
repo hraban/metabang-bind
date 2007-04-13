@@ -36,7 +36,6 @@ DISCUSSION
      #:bind
      #:fluid-bind
      #:define-dynamic-context
-     #:*defclass-macro-name-for-dynamic-context*
      #:parent-context-of))
 
 (in-package #:metabang.bind) 
@@ -269,16 +268,15 @@ This is similar to dynamic-binding but _much_ less robust."
          (declare (ignorable ,@gensyms))
          ,@result))))
 
-(defvar *defclass-macro-name-for-dynamic-context* 'defclass)
-
-(defmacro define-dynamic-context 
+(defmacro define-dynamic-context
     (name direct-slots &key direct-superclasses
      export-symbols (class-name name) chain-parents
      (create-struct nil) (create-class (not create-struct))
      struct-options
-     (defclass-macro-name *defclass-macro-name-for-dynamic-context*))
-  "This macro generates with-NAME/in-NAME/current-NAME/has-NAME macros to access a CLOS instance or a struct in a special variable.
-   The purpose is to provide an easy way to access a group of related cotextual values optionally chaining the older values (with 'parent-context-of) when needed."
+     (defclass-macro-name 'defclass))
+  "The purpose of this macro is to provide an easy way to access a group of related special variables. To do so, it generates
+   with-NAME/in-NAME/current-NAME/has-NAME macros to access either a CLOS instance or a defstruct in a special variable.
+   Optionally it can chain the \"parent\" bindings (use :CHAIN-PARENTS T and access with PARENT-CONTEXT-OF)."
   (assert (and (or create-class
                    create-struct
                    (not (or direct-slots direct-superclasses chain-parents)))

@@ -42,7 +42,5 @@
                     (eval (let ((*package* (find-package '#:metabang.bind-system)))
                             (read-from-string
                              "(progn
-                                (metatilities:export-exported-symbols '#:bind '#:metatilities)
-                                (when (eq metabang.bind:*defclass-macro-name-for-dynamic-context* 'cl:defclass)
-                                  (setf metabang.bind:*defclass-macro-name-for-dynamic-context* 'metatilities:defclass*)))")))))
+                                (metatilities:export-exported-symbols '#:bind '#:metatilities))")))))
 
