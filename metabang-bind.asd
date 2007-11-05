@@ -1,46 +1,37 @@
 (defpackage #:metabang.bind-system (:use #:cl #:asdf))
 (in-package #:metabang.bind-system)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  ;; try hard
-  (unless (find-system 'asdf-system-connections nil)
-    (when (find-package 'asdf-install)
-      (funcall (intern (symbol-name :install) :asdf-install)
-               'asdf-system-connections)))
-  ;; give up with a useful (?) error message
-  (if (find-system 'asdf-system-connections nil)
-      (asdf:operate 'asdf:load-op 'asdf-system-connections)
-      (progn
-        (terpri)
-        (format t "~&;; Warning: The bind system requires ASDF-system-connections. See~%~
-               http://www.cliki.net/asdf-system-connections for details and download~%~
-               instructions."))))
+(when (find-system 'asdf-system-connections nil)
+  (asdf:operate 'asdf:load-op 'asdf-system-connections))
 
 (defsystem metabang-bind
-  :version "0.2.3"
+  :version "0.5.1"
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let* and destructuring-bind."
   :components ((:module "dev"
-	            :components ((:file "bind")))
-               (:module "website"
-                        :components ((:module "source"
-                                              :components ((:static-file "index.lml"))))))
+	            :components ((:file "bind"))))
+  :depends-on (#+asdf-system-connections :asdf-system-connections)
   :in-order-to ((test-op (load-op metabang-bind-test)))
   :perform (test-op :after (op c)
                     (describe 
 		     (funcall (intern (symbol-name '#:run-tests) :lift) 
-			      :suite '#:metabang-bind-test)))
-  :depends-on (#+asdf-system-connections asdf-system-connections))
+			      :suite '#:test-bind)))
+  :depends-on ()) 
 
-#+asdf-system-connections
-(defsystem-connection bind-and-metatilities
+(defmethod operation-done-p 
+           ((o test-op) (c (eql (find-system 'metabang-bind))))
+  (values nil))
+
+#+asdf-system-connections 
+(asdf:defsystem-connection bind-and-metatilities
   :requires (metabang-bind metatilities-base)
   :perform (load-op :after (op c)
-                    (use-package (find-package '#:metabang.bind)
-                                 (find-package '#:metatilities))
-                    (eval (let ((*package* (find-package '#:metabang.bind-system)))
-                            (read-from-string
-                             "(progn
-                                (metatilities:export-exported-symbols '#:bind '#:metatilities))")))))
+                    (use-package (find-package 'metabang.bind) 
+                                 (find-package 'metatilities))
+                    (funcall (intern 
+                              (symbol-name :export-exported-symbols)
+                              'metatilities)
+                             'bind 'metatilities))) 
+
 

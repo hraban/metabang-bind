@@ -1,9 +1,10 @@
 (in-package common-lisp-user)
 
-(defpackage "METABANG-BIND-TEST-SYSTEM" (:use #:common-lisp #:asdf))
-(in-package "METABANG-BIND-TEST-SYSTEM")
+(defpackage #:metabang-bind-test-system
+  (:use #:common-lisp #:asdf))
+(in-package #:metabang-bind-test-system)
 
-(defsystem METABANG-BIND-test
+(defsystem metabang-bind-test
   :version "0.1"
   :author "Gary Warren King <gwking@metabang.com>"
   :maintainer "Gary Warren King <gwking@metabang.com>"
@@ -13,4 +14,4 @@
                         :components ((:file "package")
                                      (:file "test-bind" 
                                             :depends-on ("package")))))
-  :depends-on (METABANG-BIND lift))
+  :depends-on (metabang-bind lift))
