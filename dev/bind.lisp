@@ -4,7 +4,7 @@
 
 http://www.opensource.org/licenses/mit-license.php
 
-Copyright (c) 2004-2006 Gary Warren King, metabang.com
+Copyright (c) 2004-2007 Gary Warren King, metabang.com
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -29,14 +29,21 @@ Author: Gary King
 DISCUSSION
 
 |#
+
 (defpackage #:metabang.bind
     (:use #:common-lisp)
     (:nicknames #:bind #:metabang-bind)
     (:export 
      #:bind
      #:fluid-bind
-     #:define-dynamic-context
-     #:parent-context-of))
+     #:bind-generate-bindings
+
+     *bind-all-declarations*
+     *bind-non-var-declarations*
+     *bind-lambda-list-markers*
+
+     bind-error
+     bind-keyword/optional-nil-with-default-error))
 
 (in-package #:metabang.bind) 
            
@@ -51,8 +58,7 @@ DISCUSSION
   (remove 'type
           (set-difference *bind-all-declarations* *bind-non-var-declarations*)))
 
-
-(defparameter *lambda-list-markers* 
+(defparameter *bind-lambda-list-markers* 
   '(&key &body &rest &args &optional))
 
 (define-condition bind-error (error)
@@ -159,7 +165,7 @@ in a binding is a list and the first item in the list is 'values'."
   (let ((result nil))
     (labels ((do-it (thing doing-defaults?)
 	       (cond ((atom thing) 
-		      (unless (or (member thing *lambda-list-markers*)
+		      (unless (or (member thing *bind-lambda-list-markers*)
 				  (null thing))
 			(push thing result)))
 		     ((dotted-pair-p thing)
@@ -178,6 +184,11 @@ in a binding is a list and the first item in the list is 'values'."
       (do-it lambda-list nil))
     (nreverse result)))
 
+#+(or)
+(loop for item in lambda-list 
+   unless (member item *bind-lambda-list-markers*) collect
+     (if (consp item) (first item) item))
+
 (defun bind-expand-declarations (declarations)
   (loop for declaration in declarations append
         (loop for decl in (rest declaration) append
@@ -192,7 +203,6 @@ in a binding is a list and the first item in the list is 'values'."
                      ;; a type spec
                      (when (eq (first decl) 'type)
                        (setf decl (rest decl)))
-                     
                      (loop for var in (rest decl) collect
                            `(type ,(first decl) ,var)))))))
 
@@ -202,14 +212,15 @@ in a binding is a list and the first item in the list is 'values'."
   ;; each declaration is separate
   (let ((declaration
          (loop for declaration in declarations 
-               when (or (member (first declaration) *bind-non-var-declarations*)
-                        (and (member (first declaration) *bind-simple-var-declarations*)
+               when (or (member (first declaration)
+				*bind-non-var-declarations*)
+                        (and (member (first declaration)
+				     *bind-simple-var-declarations*)
                              (member (second declaration) var-names))
                         (member (third declaration) var-names)) collect
                declaration))) 
     (when declaration 
       `(declare ,@declaration))))
-
 
 ;;; ---------------------------------------------------------------------------
 ;;; fluid-bind
@@ -410,5 +421,3 @@ This is similar to dynamic-binding but _much_ less robust."
 (fluid-bind (a b)
   (+ a a))
 |#
-
-

@@ -8,7 +8,7 @@
   :author "Gary Warren King <gwking@metabang.com>"
   :maintainer "Gary Warren King <gwking@metabang.com>"
   :licence "MIT Style License"
-  :description "Tests for METABANG-BIND"
+  :description "Tests for metabang-bind"
   :components ((:module "unit-tests"
                         :components ((:file "package")
                                      (:file "test-bind" 
