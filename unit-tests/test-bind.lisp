@@ -1,13 +1,14 @@
 (in-package #:metabang-bind-test)
 
-(deftestsuite metabang-bind-test () ())
+(deftestsuite test-bind () ())
 
-(deftestsuite test-bind-fix-nils-destructured (metabang-bind-test)
+(deftestsuite test-bind-fix-nils-destructured (test-bind)
   ())
 
 (addtest (test-bind-fix-nils-destructured)
   simple-list
-  (ensure-same (bind-fix-nils-destructured '(a b c)) (values '(a b c) nil) :test #'equal))
+  (ensure-same (bind-fix-nils-destructured '(a b c)) (values '(a b c) nil)
+	       :test #'equal))
   
 (addtest (test-bind-fix-nils-destructured)
   simple-list-with-nil
@@ -21,16 +22,17 @@
   dotted-list
   (multiple-value-bind (vars ignores)
                        (bind-fix-nils-destructured '(a . b)) 
-    (ensure-same (car vars) 'a)
-    (ensure-same (cdr vars) 'b)
+    (ensure-same (first vars) 'a)
+    (ensure-same (second vars) 'b)
     (ensure-same ignores nil)))
 
 (addtest (test-bind-fix-nils-destructured)
   dotted-list-with-nil-1
   (multiple-value-bind (vars ignores)
                        (bind-fix-nils-destructured '(nil . b)) 
-    (ensure-same (car vars) (first ignores))
-    (ensure-same (cdr vars) 'b)
+    (ensure-same (first vars) (first ignores))
+    (ensure-same (second vars) 'b)
+    (ensure-same (length vars) 2)
     (ensure-same (length ignores) 1)))
 
 (addtest (test-bind-fix-nils-destructured)
@@ -74,38 +76,5 @@
     (ensure-same vars '(a b &key (c 1) d (e x y)
                         &allow-other-keys) :test #'equal)))
 
-;;;;;
-
-(deftestsuite bind-get-vars-from-lambda-list (metabang-bind-test)
-  ()
-  :equality-test #'equal)
-
-(addtest (bind-get-vars-from-lambda-list)
-  simple-1
-  (ensure-same (bind-get-vars-from-lambda-list 
-		'(a b c)) '(a b c)))
-
-(addtest (bind-get-vars-from-lambda-list)
-  simple-2
-  (ensure-same (bind-get-vars-from-lambda-list 
-		'(a b c &rest args)) '(a b c args)))
-
-(addtest (bind-get-vars-from-lambda-list)
-  test-1
-  (ensure-same (bind-get-vars-from-lambda-list 
-		'(a b &key (c 1))) '(a b c)))
-
-;; Jonathan McKitrick's example
-(addtest (bind-get-vars-from-lambda-list)
-  test-2
-  (ensure-same (bind-get-vars-from-lambda-list 
-		'((item arg1 arg2 &rest rest1) &rest rest2))
-	       '(item arg1 arg2 rest1 rest2)))
-
-;; Chris Dean's example
-(addtest (bind-get-vars-from-lambda-list)
-  test-2
-  (ensure-same (bind::bind-get-vars-from-lambda-list 
-		'(a &optional (b 0)))
-	       '(a b)))
+;;;;
 

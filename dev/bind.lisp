@@ -48,8 +48,8 @@ DISCUSSION
 (in-package #:metabang.bind) 
            
 (defparameter *bind-all-declarations*
-  '(dynamic-extent ignore optimize ftype inline special 
-    ignorable notinline type))
+  '(dynamic-extent ignore optimize ftype inline 
+    special ignorable notinline type))
 
 (defparameter *bind-non-var-declarations*
   '(optimize ftype inline notinline))
@@ -62,22 +62,27 @@ DISCUSSION
   '(&key &body &rest &args &optional))
 
 (define-condition bind-error (error)
-                  ((binding :initform nil :initarg :binding :reader binding)))
+                  ((binding
+		    :initform nil
+		    :initarg :binding
+		    :reader binding)))
 
 (define-condition bind-keyword/optional-nil-with-default-error (bind-error)
-  ((bad-variable :initform nil :initarg :bad-variable :reader bad-variable))
+                  ((bad-variable 
+		    :initform nil
+		    :initarg :bad-variable
+		    :reader bad-variable))
   (:report (lambda (c s)
              (format s "Bad binding '~S' in '~A'; cannot use a default value for &key or &optional arguments."
                      (bad-variable c) (binding c)))))
 
 (defmacro bind ((&rest bindings) &body body)
-  "Bind is a replacement for let*, destructuring-bind and multiple-value-bind.
-An example is probably the best way to describe its syntax:
+  "Bind is a replacement for let*, destructuring-bind and multiple-value-bind. An example is probably the best way to describe its syntax:
 
     \(bind \(\(a 2\)
            \(\(b &rest args &key \(c 2\) &allow-other-keys\) '\(:a :c 5 :d 10 :e 54\)\)
            \(\(values d e\) \(truncate 4.5\)\)\)
-      \(list a b c d e args\)\)
+         \(list a b c d e args\)\)
 
 Simple bindings are as in let*. Destructuring is done if the first item
 in a binding is a list. Multiple value binding is done if the first item
@@ -92,37 +97,134 @@ in a binding is a list and the first item in the list is 'values'."
 
 (defun bind-macro-helper (bindings declarations body)
   (if bindings
-    (let ((binding (first bindings))
-          (remaining-bindings (rest bindings))
-          variable-form value-form)
-      (if (consp binding)
-        (setf variable-form (first binding)
-              value-form (second binding))
-        (setf variable-form binding))
-      
-      (cond ((and (consp variable-form)
-                  (or (eq (first variable-form) 'cl:values)
-		      (eq (first variable-form) ':values)))
-             (multiple-value-bind (vars ignores)
-                                  (bind-fix-nils (rest variable-form))
-               `((multiple-value-bind ,vars ,value-form
-                   ,@(when ignores `((declare (ignore ,@ignores))))
-                   ,(bind-filter-declarations declarations (rest variable-form))
-                   ,@(bind-macro-helper remaining-bindings declarations body)))))
-            ((consp variable-form)
-             (multiple-value-bind (vars ignores)
-                                  (bind-fix-nils-destructured variable-form)
-               `((destructuring-bind ,vars ,value-form
-                   ,@(when ignores `((declare (ignore ,@ignores))))
-                   ,(bind-filter-declarations declarations variable-form)
-                   ,@(bind-macro-helper remaining-bindings declarations body)))))
-            (t
-             `((let (,@(if value-form
-                         `((,variable-form ,value-form))
-                         `(,variable-form)))
-                 ,(bind-filter-declarations declarations variable-form)
-                 ,@(bind-macro-helper remaining-bindings declarations body))))))
-    body))
+      (let ((binding (first bindings))
+	    (remaining-bindings (rest bindings))
+	    variable-form value-form)
+	(if (consp binding)
+	    (setf variable-form (first binding)
+		  value-form (second binding))
+	    (setf variable-form binding))
+	(if (and (consp variable-form)
+		 (or (eq (first variable-form) 'cl:values)
+		     (eq (symbol-package (first variable-form))
+			 (load-time-value (find-package :keyword)))))
+	    (bind-generate-bindings 
+	     (first variable-form)
+	     (rest variable-form)
+	     value-form body declarations remaining-bindings)
+	    (bind-generate-bindings
+	     variable-form
+	     variable-form
+	     value-form body declarations remaining-bindings)))
+      body))
+
+(defmethod bind-generate-bindings ((kind symbol) variable-form value-form
+				   body declarations remaining-bindings)
+  `((let (,@(if value-form
+		`((,variable-form ,value-form))
+		`(,variable-form)))
+      ,(bind-filter-declarations declarations variable-form)
+      ,@(bind-macro-helper remaining-bindings declarations body))))
+
+(defmethod bind-generate-bindings ((kind cons) variable-form value-form
+				   body declarations remaining-bindings)
+  (multiple-value-bind (vars ignores)
+      (bind-fix-nils-destructured variable-form)
+    `((destructuring-bind ,vars ,value-form
+	,@(when ignores `((declare (ignore ,@ignores))))
+	,(bind-filter-declarations declarations variable-form)
+	,@(bind-macro-helper 
+	   remaining-bindings declarations body)))))
+
+(defmethod bind-generate-bindings ((kind (eql :values)) variable-form value-form
+				   body declarations remaining-bindings)
+  (bind-handle-values variable-form value-form
+		      body declarations remaining-bindings))
+
+(defmethod bind-generate-bindings 
+    ((kind (eql 'cl:values)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-values variable-form value-form
+		      body declarations remaining-bindings))
+
+(defun bind-handle-values (variable-form value-form
+			   body declarations remaining-bindings)
+  (multiple-value-bind (vars ignores)
+      (bind-fix-nils variable-form)
+    `((multiple-value-bind ,vars ,value-form
+	,@(when ignores `((declare (ignore ,@ignores))))
+	,(bind-filter-declarations declarations (rest variable-form))
+	,@(bind-macro-helper
+	   remaining-bindings declarations body)))))
+
+(defmethod bind-generate-bindings ((kind (eql :plist)) variable-form value-form
+				   body declarations remaining-bindings)
+  (bind-handle-plist variable-form value-form
+		     body declarations remaining-bindings))
+
+(defmethod bind-generate-bindings ((kind (eql :property-list))
+				   variable-form value-form
+				   body declarations remaining-bindings)
+  (bind-handle-plist variable-form value-form
+		     body declarations remaining-bindings))
+
+(defmethod bind-generate-bindings ((kind (eql :properties))
+				   variable-form value-form
+				   body declarations remaining-bindings)
+  (bind-handle-plist variable-form value-form
+		     body declarations remaining-bindings))
+
+(defun bind-handle-plist (variable-form value-form
+			  body declarations remaining-bindings)
+  (let ((vars variable-form)
+	(plist-gensym (gensym "plist")))
+    (assert vars)
+    `((let* ((,plist-gensym ,value-form)
+	     ,@(loop for var in vars collect
+		    (let* ((var-name 
+			    (or (and (consp var) (first var))
+				var))
+			   (var-key 
+			    (or (and (consp var) (second var))
+				(intern (symbol-name var-name)
+					:keyword))))
+		      `(,var-name (getf ,plist-gensym ,var-key)))))
+	,(bind-filter-declarations declarations variable-form)
+	,@(bind-macro-helper 
+	   remaining-bindings declarations body)))))
+
+(defmethod bind-generate-bindings 
+    ((kind (eql :structure)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-structure variable-form value-form
+			 body declarations remaining-bindings))
+
+(defmethod bind-generate-bindings
+    ((kind (eql :struct)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-structure variable-form value-form
+			 body declarations remaining-bindings))
+
+(defun bind-handle-structure (variable-form value-form
+			      body declarations remaining-bindings)
+  (let ((conc-name (first variable-form))
+	(vars (cdr variable-form))
+	(structure-gensym (gensym "struct")))
+    (assert conc-name)
+    (assert vars)
+    `((let* ((,structure-gensym ,value-form)
+	     ,@(loop for var in vars collect
+		    (let ((var-var (or (and (consp var) (first var))
+				       var))
+			  (var-conc (or (and (consp var) (second var))
+					var)))
+		      `(,var-var (,(intern 
+				    (format nil "~a~a" 
+					    conc-name var-conc)) 
+				   ,structure-gensym)))))
+	,(bind-filter-declarations declarations variable-form)
+	,@(bind-macro-helper 
+	   remaining-bindings declarations body)))))
 
 (defun bind-fix-nils (var-list)
   (let (vars ignores)
@@ -163,25 +265,18 @@ in a binding is a list and the first item in the list is 'values'."
 
 (defun bind-get-vars-from-lambda-list (lambda-list)
   (let ((result nil))
-    (labels ((do-it (thing doing-defaults?)
+    (labels ((do-it (thing)
 	       (cond ((atom thing) 
 		      (unless (or (member thing *bind-lambda-list-markers*)
 				  (null thing))
 			(push thing result)))
 		     ((dotted-pair-p thing)
-		      (do-it (car thing) doing-defaults?) 
-		      (do-it (cdr thing) doing-defaults?))
+		      (do-it (car thing)) 
+		      (do-it (cdr thing)))
 		     (t
-		      (dolist (it thing)
-			(cond ((member it '(&optional &key))
-			       (setf doing-defaults? t))
-			      ((consp it)
-			       (if doing-defaults? 
-				   (do-it (first it) nil)
-				   (do-it it nil)))
-			      (t
-			       (do-it it nil))))))))
-      (do-it lambda-list nil))
+		      (do-it (car thing))
+		      (do-it (cdr thing))))))
+      (do-it lambda-list))
     (nreverse result)))
 
 #+(or)
@@ -194,11 +289,9 @@ in a binding is a list and the first item in the list is 'values'."
         (loop for decl in (rest declaration) append
               (cond ((member (first decl) *bind-non-var-declarations*)
                      (list decl))
-                    
                     ((member (first decl) *bind-simple-var-declarations*)
                      (loop for var in (rest decl) collect
                            `(,(first decl) ,var)))
-                    
                     (t
                      ;; a type spec
                      (when (eq (first decl) 'type)
@@ -207,8 +300,8 @@ in a binding is a list and the first item in the list is 'values'."
                            `(type ,(first decl) ,var)))))))
 
 (defun bind-filter-declarations (declarations var-names)
-  (setf var-names (if (consp var-names) var-names (list var-names)))
-  (setf var-names (bind-get-vars-from-lambda-list var-names))  
+  (setf var-names (if (consp var-names) var-names (list var-names)))  
+  (setf var-names (bind-get-vars-from-lambda-list var-names))
   ;; each declaration is separate
   (let ((declaration
          (loop for declaration in declarations 
@@ -240,26 +333,29 @@ This is similar to dynamic-binding but _much_ less robust."
         (cleanup-forms nil)
         (gensyms nil))
     (loop for binding in bindings collect
-          (destructuring-bind (setup-form cleanup-form)
-                              (cond ((consp binding)
-                                     (destructuring-bind (var value) binding
-                                       (let ((g (gensym)))
-                                         (push g gensyms)
-                                         (cond ((atom var)
-                                                ;; lexical or special?
-                                                (if (boundp var)
-                                                  `((:setf (setf ,g ,var ,var ,value))
-                                                    (setf ,var ,g))
-                                                  `((:bind (,var ,value)) nil)))
-                                               ((and (fboundp (first var))
-                                                     (not (eq (first var) 'values)))
-                                                ;; putative place
-                                                `((:setf (setf ,g ,var ,var ,value))
-                                                  (setf ,var ,g)))
-                                               (t
-                                                `((:bind (,var ,value)) nil))))))
-                                    (t
-                                     `((:bind (,binding nil)) nil)))
+          (destructuring-bind 
+		(setup-form cleanup-form)
+	      (cond ((consp binding)
+		     (destructuring-bind (var value) binding
+		       (let ((g (gensym)))
+			 (push g gensyms)
+			 (cond ((atom var)
+				`((:bind (,var ,value)) nil)
+				#+(or)
+				;; lexical or special?
+				(if (boundp var)
+				    `((:bind (,var ,value)) nil)
+				    `((:setf (setf ,g ,var ,var ,value))
+				      (setf ,var ,g))))
+			       ((and (fboundp (first var))
+				     (not (eq (first var) 'values)))
+				;; putative place
+				`((:setf (setf ,g ,var ,var ,value))
+				  (setf ,var ,g)))
+			       (t
+				`((:bind (,var ,value)) nil))))))
+		    (t
+		     `((:bind (,binding nil)) nil)))
             (push setup-form setup-forms)
             (push cleanup-form cleanup-forms)))
     (let ((result body))
@@ -278,116 +374,6 @@ This is similar to dynamic-binding but _much_ less robust."
       `(let ,gensyms
          (declare (ignorable ,@gensyms))
          ,@result))))
-
-(defmacro define-dynamic-context
-    (name direct-slots &key direct-superclasses
-     export-symbols (class-name name) chain-parents
-     (create-struct nil) (create-class (not create-struct))
-     struct-options
-     (defclass-macro-name 'defclass))
-  "The purpose of this macro is to provide an easy way to access a group of related special variables. To do so, it generates
-   with-NAME/in-NAME/current-NAME/has-NAME macros to access either a CLOS instance or a defstruct in a special variable.
-   Optionally it can chain the \"parent\" bindings (use :CHAIN-PARENTS T and access with PARENT-CONTEXT-OF)."
-  (assert (and (or create-class
-                   create-struct
-                   (not (or direct-slots direct-superclasses chain-parents)))
-               (or (not create-struct)
-                   (not direct-superclasses)))
-          () "Invalid combination of DIRECT-SLOTS, DIRECT-SUPERCLASSES, CHAIN-PARENTS and CREATE-CLASS/CREATE-STRUCT.")
-  (assert (or (not struct-options) create-struct) () "STRUCT-OPTIONS while no CREATE-STRUCT?")
-  (assert (not (and create-class create-struct)) () "Only one of CREATE-CLASS and CREATE-STRUCT is allowed.")
-  (flet ((concatenate-symbol (&rest args)
-           (let* ((package nil)
-                  (symbol-name (string-upcase
-                                (with-output-to-string (str)
-                                  (dolist (arg args)
-                                    (typecase arg
-                                      (string (write-string arg str))
-                                      (package (setf package arg))
-                                      (symbol (unless package
-                                                (setf package (symbol-package arg)))
-                                              (write-string (symbol-name arg) str))
-                                      (integer (write-string (princ-to-string arg) str))
-                                      (character (write-char arg) str)
-                                      (t (error "Cannot convert argument ~S to symbol" arg))))))))
-             (if package
-                 (intern symbol-name package)
-                 (intern symbol-name))))
-         (strcat (&rest string-designators)
-           (with-output-to-string (str)
-             (dolist (s string-designators)
-               (when s (princ s str))))))
-    (let ((special-var-name (concatenate-symbol "%" name "%"))
-          (extractor-name (concatenate-symbol "current-" name))
-          (has-checker-name (concatenate-symbol "has-" name))
-          (with-new-macro-name (concatenate-symbol "with-new-" name))
-          (with-macro-name (concatenate-symbol "with-" name))
-          (struct-constructor-name (when create-struct
-                                     (or (second (assoc :constructor struct-options))
-                                         (concatenate-symbol "make-" name))))
-          (struct-conc-name (when create-struct
-                              (or (second (assoc :conc-name struct-options))
-                                  (concatenate-symbol class-name "-")))))
-      `(progn
-        ,(when export-symbols
-               `(export (list ',extractor-name
-                         ',with-new-macro-name
-                         ',with-macro-name
-                         ',(concatenate-symbol "in-" name))))
-        ;; generate the context class definition
-        ,(when create-class
-               `(,defclass-macro-name ,class-name ,direct-superclasses
-                 ,(if chain-parents
-                      (append `((parent-context nil :accessor parent-context-of)) direct-slots) ; accessor is explicitly given to force it to be interned in this package
-                      direct-slots)))
-        ,(when create-struct
-               `(defstruct (,name ,@struct-options)
-                 ,@(if chain-parents
-                       (append `((parent-context nil :type (or null ,class-name))) direct-slots)
-                       direct-slots)))
-        ;; generate the with-new-... macro
-        (defmacro ,with-new-macro-name ((&rest initargs &key &allow-other-keys)
-                                        &body forms)
-          `(,',with-macro-name ,,(if create-struct
-                                   ``(,',struct-constructor-name ,@initargs)
-                                   ``(make-instance ',',class-name ,@initargs))
-            ,@forms))
-        ;; generate the with-... macro
-        (defmacro ,with-macro-name (context &body forms)
-          (let ((context-instance (gensym "CONTEXT-INSTANCE"))
-                (parent (gensym "PARENT")))
-            (declare (ignorable parent))
-            `(let* ((,context-instance ,context)
-                    ,@,(when chain-parents
-                             ``((,parent (when (,',has-checker-name)
-                                           (,',extractor-name)))))
-                    (,',special-var-name ,context-instance))
-              (declare (special ,',special-var-name))
-              ,@,(when chain-parents
-                       ``((setf (,',(if create-struct
-                                       (concatenate-symbol struct-conc-name "parent-context")
-                                       'parent-context-of) ,context-instance)
-                           ,parent)))
-              (unless ,context-instance
-                (error ,',(strcat "Called with nil " (string-downcase name))))
-              ,@forms)))
-        ;; generate the in-... macro
-        (defmacro ,(concatenate-symbol "in-" name) (var-name-or-slot-name-list &body forms)
-          (let ((slots (when (listp var-name-or-slot-name-list)
-                         var-name-or-slot-name-list)))
-            (if slots
-                `(with-slots ,slots (,',extractor-name)
-                  ,@forms)
-                `(let ((,var-name-or-slot-name-list (,',extractor-name)))
-                  ,@forms))))
-        ;; generate the current-... function
-        (declaim (inline ,extractor-name))
-        (defun ,extractor-name ()
-          (symbol-value ',special-var-name))
-        ;; generate the has-... function
-        (declaim (inline ,has-checker-name))
-        (defun ,has-checker-name ()
-          (boundp ',special-var-name))))))
 
 #|
 (let ((a 2))
