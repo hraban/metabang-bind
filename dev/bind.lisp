@@ -180,18 +180,31 @@ in a binding is a list and the first item in the list is 'values'."
 	(plist-gensym (gensym "plist")))
     (assert vars)
     `((let* ((,plist-gensym ,value-form)
-	     ,@(loop for var in vars collect
-		    (let* ((var-name 
-			    (or (and (consp var) (first var))
-				var))
-			   (var-key 
-			    (or (and (consp var) (second var))
-				(intern (symbol-name var-name)
-					:keyword))))
-		      `(,var-name (getf ,plist-gensym ,var-key)))))
+	     ,@(loop for spec in vars collect
+		    (let* ((spec (if (consp spec) spec (list spec)))
+			   (var-name (first spec))
+			   var-key var-default)
+		      (case (length spec)
+			(1 (setf var-key (first spec)))
+			(2 (setf var-key (second spec)))
+			(3 (setf var-key (second spec)
+				 var-default (third spec)))
+			(t
+			 (error "bad properly list variable specification: ~s" 
+				spec)))
+		      (when (string= (symbol-name var-key) "_")
+			(setf var-key var-name))
+		      (setf var-key (intern (symbol-name var-key) :keyword))
+		      `(,var-name (getf ,plist-gensym ,var-key 
+					,@(when var-default
+						`(,var-default)))))))
 	,(bind-filter-declarations declarations variable-form)
 	,@(bind-macro-helper 
 	   remaining-bindings declarations body)))))
+
+#+(or)
+(bind (((:plist a (b _) (c _ 2) (dd d)) '(:b "B" :a "A" :d "D")))
+  (list a b c dd))
 
 (defmethod bind-generate-bindings 
     ((kind (eql :structure)) variable-form value-form
