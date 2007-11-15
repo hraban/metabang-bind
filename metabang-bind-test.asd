@@ -13,5 +13,9 @@
   :components ((:module "unit-tests"
                         :components ((:file "package")
                                      (:file "test-bind" 
-                                            :depends-on ("package")))))
-  :depends-on (metabang-bind lift))
+                                            :depends-on ("package"))
+				     (:file "structures"
+					    :depends-on ("test-bind"))
+				     (:file "plists"
+					    :depends-on ("test-bind")))))
+  :depends-on (:metabang-bind :lift))
