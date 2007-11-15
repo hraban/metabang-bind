@@ -21,7 +21,7 @@ Bind combines _let_, _destructuring-bind_ and _multiple-value-bind_ and a whole 
 2. make it easier to understand all of the different forms
 of destructuring and variable binding by unifying the multiple forms of syntax and reducing special cases.
 
-Bind is extensible. It handles the traditional multiple-values, destructuring, and let-forms as well as property-lists, classes, structures. You can create new your own binding forms to make your code cleaner and easier to follow (for others _and_ yourself!).
+Bind is extensible. It handles the traditional multiple-values, destructuring, and let-forms as well as property-lists, classes, and structures. Even better, you can create new your own binding forms to make your code cleaner and easier to follow (for others _and_ yourself!).
 
 Simple bindings are as in _let*_. Destructuring is done if the first item in a binding is a list. Multiple value binding is done if the first item in a binding is a list and the first item in the list is 'values'.
 
@@ -137,6 +137,10 @@ We can bind these fields using:
     => (2 3 yes)
 
 ### Bind with classes
+
+Coming soon.
+
+## Extending bind yourself
 
 Coming soon.
 

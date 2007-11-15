@@ -94,9 +94,9 @@ a:hover {
 
 body {
   font-family: Georgia, "Times New Roman", Times, serif;
-	margin-right: 0.5in;
-	margin-left: 0.5in;
-	margin-bottom: 0.25px;
+	margin-right: 0.75in;
+	margin-left: 0.75in;
+	margin-bottom: 0.25in;
 }
 
 h1, h2, h3, h4 { 
@@ -178,12 +178,6 @@ pre {
 	margin-right: 2em;
 	margin-left: 2em;
 }
-
-#footer {
-	margin-top: 2em;
-	border-top-style: inset;
-	border-top-width: 2px;
-}
 #navigation li {
 	display: inline;
 	border-right-style: dotted;
@@ -200,8 +194,27 @@ pre {
 	text-align: center;
 }
 
-#timestamp {
+#footer {
+	margin-top: 2em;
+	padding-bottom: 2em;
+	padding-top: 1em;
+	border-top-style: inset;
+	border-top-width: 2px;
 	font-size: 80%;
+	line-height: 110%;
+}
+
+#timestamp {
+	font-size: 90%;
 	text-align: right;
+	float: right;
+}
+
+#license-note {
+	float: left;
+}
+
+#copyright {
+	float: left;
 }
 

@@ -23,9 +23,7 @@
 
 ### What it is
 
-Bind combines _let_, _destructuring-bind_ and _multiple-value-bind_ and a whole lot more into a single form. Simple bindings are as in _let*_. Destructuring is done if the first item in a binding is a list. Multiple value binding is done if the first item in a binding is a list and the first item in the list is 'values'.
-
-An example is probably the best way to describe its syntax:
+Bind combines _let_, _destructuring-bind_ and _multiple-value-bind_ and a whole lot more into a single form. The [user guide][user-guide] has all the details but here is example to whet your appetite:
     
     (bind ((a 2)
            ((b &rest args &key (c 2) &allow-other-keys) '(:a :c 5 :d 10 :e 54))
@@ -35,25 +33,19 @@ An example is probably the best way to describe its syntax:
 
 Bind is especially handy when you have more than one layer of multiple-value-bind or destructuring-bind. Since bind is a single form, you don't end up too far off to the right in editor land.
 
-Bind works by parsing the bindings and rewriting them as them as necessary. Bind handles declarations correctly -- putting each at the appropriate level.
-
 Bind is released under the MIT license.
 
 {anchor mailing-lists}
 
 ### Mailing Lists
 
-metabang-bind isn't a separate project at this point but if you have questions, comments or concerns, just drop [Gary King][8] a line.
-
-   [8]: mailto:gwking@metabang.com
+Use the developer [mailing list][metabang-bind-devel] for any questions or comments regarding bind.
 
 {anchor downloads}
 
 ### Where is it
 
-A [Darcs][9] repository is available. The commands are listed below:
-    
-   [9]: http://www.darcs.net/
+A [Darcs][] repository is available. The command to get bind is:
 
     darcs get http://common-lisp.net/project/metabang-bind/
 
@@ -69,6 +61,8 @@ There's also a handy [gzipped tar file][12].
 {anchor news}
 
 ### What is happening
+
+15 Nov 2007 - New user guide; bind handles structures and property lists and is now extensible!
 
 13 Nov 2005 - Initial webpage n' stuff.
 
