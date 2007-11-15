@@ -1,8 +1,8 @@
 (in-package #:metabang-bind-test)
 
-(deftestsuite test-bind () ())
+(deftestsuite metabang-bind-test () ())
 
-(deftestsuite test-bind-fix-nils-destructured (test-bind)
+(deftestsuite test-bind-fix-nils-destructured (metabang-bind-test)
   ())
 
 (addtest (test-bind-fix-nils-destructured)
