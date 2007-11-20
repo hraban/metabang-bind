@@ -120,6 +120,9 @@ in a binding is a list and the first item in the list is 'values'."
 
 (defmethod bind-generate-bindings ((kind symbol) variable-form value-form
 				   body declarations remaining-bindings)
+  (assert (not (keywordp kind))
+	  nil
+	  "Unable binding specification ~s" kind)
   `((let (,@(if value-form
 		`((,variable-form ,value-form))
 		`(,variable-form)))
@@ -238,6 +241,52 @@ in a binding is a list and the first item in the list is 'values'."
 	,(bind-filter-declarations declarations variable-form)
 	,@(bind-macro-helper 
 	   remaining-bindings declarations body)))))
+
+(defmethod bind-generate-bindings 
+    ((kind (eql :slots)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-slots variable-form value-form
+		     body declarations remaining-bindings))
+
+(defun bind-handle-slots (variable-form value-form
+			      body declarations remaining-bindings)
+  (let ((vars variable-form)
+	(class-gensym (gensym "class")))
+    (assert vars)
+    `((let* ((,class-gensym ,value-form)
+	     ,@(loop for var in vars collect
+		    (let ((var-var (or (and (consp var) (first var))
+				       var))
+			  (var-slot (or (and (consp var) (second var))
+					var)))
+		      `(,var-var (slot-value ,class-gensym ',var-slot)))))
+	,(bind-filter-declarations declarations variable-form)
+	,@(bind-macro-helper 
+	   remaining-bindings declarations body)))))
+
+(defmethod bind-generate-bindings 
+    ((kind (eql :accessors)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-accessors variable-form value-form
+		     body declarations remaining-bindings))
+
+(defun bind-handle-accessors (variable-form value-form
+			      body declarations remaining-bindings)
+  (let ((vars variable-form)
+	(class-gensym (gensym "class")))
+    (assert vars)
+    `((let* ((,class-gensym ,value-form)
+	     ,@(loop for var in vars collect
+		    (let ((var-var (or (and (consp var) (first var))
+				       var))
+			  (var-accessor (or (and (consp var) (second var))
+					var)))
+		      `(,var-var (,var-accessor ,class-gensym)))))
+	,(bind-filter-declarations declarations variable-form)
+	,@(bind-macro-helper 
+	   remaining-bindings declarations body)))))
+
+;;;;
 
 (defun bind-fix-nils (var-list)
   (let (vars ignores)

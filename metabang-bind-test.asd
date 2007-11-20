@@ -16,6 +16,8 @@
                                             :depends-on ("package"))
 				     (:file "structures"
 					    :depends-on ("test-bind"))
+				     (:file "classes"
+					    :depends-on ("test-bind"))
 				     (:file "plists"
 					    :depends-on ("test-bind")))))
   :depends-on (:metabang-bind :lift))

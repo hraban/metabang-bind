@@ -22,17 +22,16 @@
   dotted-list
   (multiple-value-bind (vars ignores)
                        (bind-fix-nils-destructured '(a . b)) 
-    (ensure-same (first vars) 'a)
-    (ensure-same (second vars) 'b)
+    (ensure-same (car vars) 'a)
+    (ensure-same (cdr vars) 'b)
     (ensure-same ignores nil)))
 
 (addtest (test-bind-fix-nils-destructured)
   dotted-list-with-nil-1
   (multiple-value-bind (vars ignores)
                        (bind-fix-nils-destructured '(nil . b)) 
-    (ensure-same (first vars) (first ignores))
-    (ensure-same (second vars) 'b)
-    (ensure-same (length vars) 2)
+    (ensure-same (car vars) (first ignores))
+    (ensure-same (cdr vars) 'b)
     (ensure-same (length ignores) 1)))
 
 (addtest (test-bind-fix-nils-destructured)
