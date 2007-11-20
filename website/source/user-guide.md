@@ -47,6 +47,8 @@ You can use `bind` as a direct replacement for `let*`:
       (list a b))
     => (2 nil)
 
+As in `let*`, atoms are initially bound to `nil`.
+
 ### Bind with multiple-values and destructuring
 
 Suppose we define two silly functions:
@@ -110,6 +112,8 @@ Putting this altogether we can code the above let statement as:
 
 (which takes some getting used to but has the advantage of brevity).
 
+{anchor structure-bindings}
+
 ### Bind with structures
 
 Structure fields are accessed using a concatenation of the structure's `conc-name` and the name of the field. Bind therefore needs to know two things: the conc-name and the field-names. The binding-form looks like
@@ -136,12 +140,65 @@ We can bind these fields using:
       (list my-name b c))
     => (2 3 yes)
 
+{anchor class-bindings}
+
 ### Bind with classes
 
-Coming soon.
+You can read the of an instance with an accessor (if one exists) or by using slot-value{footnote Note that if an accessor exists, it will generally be much faster than slot-value because CLOS is able to cache information about the accessor and the instance.}. Bind also provides two slot-binding mechanisms: `:slots` and `:accessors`. Both look the same:
+
+    (:slots slot-spec*)
+    (:accessors accessor-spec*)
+    
+Where both slot-spec and accessor-spec can be atoms or lists with two elements.
+
+* an atom tells bind to use it as the name of the new variable _and_ to treat this name as the name of the slot or the name of the accessor, respectively.
+
+* If the specification is a list, then bind will use the first item as the variable's name and the second item as the slot-name or accessor. 
+
+Support we had a class like:
+
+    (defclass wicked-cool-class ()
+      ((a :initarg :a :accessor its-a)
+       (b :initarg :b :accessor b) 
+       (c :initarg :c :accessor just-c)))
+
+If we don't mind using the slot-names as variable names, then we can use the simplest form of `:slots`:
+
+    (bind (((:slots a b c) 
+    	(make-instance 'wicked-cool-class
+    		       :a 1 :b 2 :c 3)))
+      (list a b c))
+    ==> (1 2 3)
+
+We can also change the names within the context of our bind form:
+
+    (bind (((:slots a b (dance-count c)) 
+    	(make-instance 'wicked-cool-class
+    		       :a 1 :b 2 :c 3)))
+      (list a b dance-count))
+    ==> (1 2 3)
+
+Similarly, we can use `:accessors` with variable names that are the same as the accessor names...
+
+    (bind (((:accessors its-a b just-c) 
+    	(make-instance 'wicked-cool-class
+    		       :a 1 :b 2 :c 3)))
+      (list its-a b just-c))
+    ==> (1 2 3)
+
+or that are different:
+
+    (bind (((:accessors (a its-a) b (c just-c)) 
+    	(make-instance 'wicked-cool-class
+    		       :a 1 :b 2 :c 3)))
+      (list a b c))
+    ==> (1 2 3)
+
 
 ## Extending bind yourself
 
-Coming soon.
+Bind's syntax is extensible: the work for each binding-specification is handled by a generic function. This means that you can evolve bind to fit your program for whatever sort of data-structure makes sense for you.
+
+Details on this mechanism are coming soon (if you're impatient, you can look at the source code for the methods of `bind-generate-bindings`).
 
 {include resources/guide-footer.md}
