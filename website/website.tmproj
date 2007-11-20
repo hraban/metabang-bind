@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>currentDocument</key>
+	<string>darcs/metabang-bind/website/source/user-guide.md</string>
+	<key>documents</key>
+	<array>
+		<dict>
+			<key>name</key>
+			<string>images</string>
+			<key>regexFolderFilter</key>
+			<string>!.*/(\.[^/]*|CVS|_darcs|_MTN|\{arch\}|blib|.*~\.nib|.*\.(framework|app|pbproj|pbxproj|xcode(proj)?|bundle))$</string>
+			<key>sourceDirectory</key>
+			<string>source/images</string>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>source/index.md</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>resources</string>
+			<key>regexFolderFilter</key>
+			<string>!.*/(\.[^/]*|CVS|_darcs|_MTN|\{arch\}|blib|.*~\.nib|.*\.(framework|app|pbproj|pbxproj|xcode(proj)?|bundle))$</string>
+			<key>sourceDirectory</key>
+			<string>source/resources</string>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>source/user-guide.css</string>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>source/user-guide.md</string>
+			<key>lastUsed</key>
+			<date>2007-11-20T15:02:49Z</date>
+		</dict>
+	</array>
+	<key>fileHierarchyDrawerWidth</key>
+	<integer>200</integer>
+	<key>metaData</key>
+	<dict>
+		<key>darcs/metabang-bind/website/source/user-guide.md</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>35</integer>
+				<key>line</key>
+				<integer>203</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>168</integer>
+		</dict>
+	</dict>
+	<key>openDocuments</key>
+	<array>
+		<string>darcs/metabang-bind/website/source/user-guide.md</string>
+	</array>
+	<key>showFileHierarchyDrawer</key>
+	<true/>
+	<key>windowFrame</key>
+	<string>{{805, 23}, {578, 788}}</string>
+</dict>
+</plist>
