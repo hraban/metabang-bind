@@ -148,8 +148,10 @@ in a binding is a list and the first item in the list is 'values'."
 (defmethod bind-generate-bindings 
     ((kind (eql 'cl:values)) variable-form value-form
      body declarations remaining-bindings)
-  (bind-handle-values variable-form value-form
-		      body declarations remaining-bindings))
+  (if (consp variable-form)
+      (bind-handle-values variable-form value-form
+                          body declarations remaining-bindings)
+      (call-next-method)))
 
 (defun bind-handle-values (variable-form value-form
 			   body declarations remaining-bindings)
