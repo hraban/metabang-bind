@@ -106,8 +106,9 @@ in a binding is a list and the first item in the list is 'values'."
 	    (setf variable-form binding))
 	(if (and (consp variable-form)
 		 (or (eq (first variable-form) 'cl:values)
-		     (eq (symbol-package (first variable-form))
-			 (load-time-value (find-package :keyword)))))
+		     (and (symbolp (first variable-form))
+			  (eq (symbol-package (first variable-form))
+			      (load-time-value (find-package :keyword))))))
 	    (bind-generate-bindings 
 	     (first variable-form)
 	     (rest variable-form)
