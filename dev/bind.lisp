@@ -170,7 +170,7 @@ in a binding is a list and the first item in the list is 'values'."
       (bind-fix-nils variable-form)
     `((multiple-value-bind ,vars ,value-form
 	,@(when ignores `((declare (ignore ,@ignores))))
-	,(bind-filter-declarations declarations (rest variable-form))
+	,(bind-filter-declarations declarations variable-form)
 	,@(bind-macro-helper
 	   remaining-bindings declarations body)))))
 
