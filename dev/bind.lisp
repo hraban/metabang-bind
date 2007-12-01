@@ -119,6 +119,17 @@ in a binding is a list and the first item in the list is 'values'."
 	     value-form body declarations remaining-bindings)))
       body))
 
+(defmethod bind-generate-bindings ((kind array) variable-form value-form
+				   body declarations remaining-bindings)
+  (let ((array-size (array-total-size variable-form))
+	(gvalue (gensym "value")))
+    `((let* ((,gvalue ,value-form)
+	    ,@(loop for i below array-size
+		 for var = (row-major-aref variable-form i)
+		 unless (eq var nil) collect
+		   `(,var (row-major-aref ,gvalue ,i))))
+      ,@(bind-macro-helper remaining-bindings declarations body)))))	
+
 (defmethod bind-generate-bindings ((kind symbol) variable-form value-form
 				   body declarations remaining-bindings)
   (assert (not (keywordp kind))

@@ -10,14 +10,16 @@
   :maintainer "Gary Warren King <gwking@metabang.com>"
   :licence "MIT Style License"
   :description "Tests for metabang-bind"
-  :components ((:module "unit-tests"
+  :components ((:module "setup"
+			:pathname "unit-tests/"
                         :components ((:file "package")
-                                     (:file "test-bind" 
-                                            :depends-on ("package"))
-				     (:file "structures"
-					    :depends-on ("test-bind"))
-				     (:file "classes"
-					    :depends-on ("test-bind"))
-				     (:file "plists"
-					    :depends-on ("test-bind")))))
+				     (:file "test-bind" 
+                                            :depends-on ("package"))))
+               (:module "tests"
+			:pathname "unit-tests/"
+			:depends-on ("setup")
+                        :components ((:file "structures")
+				     (:file "classes")
+				     (:file "plists")
+				     (:file "arrays"))))
   :depends-on (:metabang-bind :lift))
