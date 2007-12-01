@@ -194,6 +194,17 @@ or that are different:
       (list a b c))
     ==> (1 2 3)
 
+{anchor array-bindings}
+
+### Bind with arrays
+
+Tamas Padd had the idea of letting `bind` handle arrays too. For example, 
+
+    (bind ((#(a b c) #(1 2 3)))
+      (list a b c))
+    ==> (1 2 3)
+
+One quick method definition and a few unit-tests later and bind does!
 
 ## Extending bind yourself
 

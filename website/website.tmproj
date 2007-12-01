@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>source/resources/navigation.md</string>
+	<string>source/user-guide.md</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -17,6 +17,8 @@
 		<dict>
 			<key>filename</key>
 			<string>source/index.md</string>
+			<key>lastUsed</key>
+			<date>2007-12-01T23:36:02Z</date>
 		</dict>
 		<dict>
 			<key>expanded</key>
@@ -36,13 +38,29 @@
 			<key>filename</key>
 			<string>source/user-guide.md</string>
 			<key>lastUsed</key>
-			<date>2007-11-23T20:17:10Z</date>
+			<date>2007-12-01T23:36:02Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
 	<integer>200</integer>
 	<key>metaData</key>
 	<dict>
+		<key>source/index.md</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>68</integer>
+				<key>line</key>
+				<integer>64</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>42</integer>
+		</dict>
 		<key>source/resources/guide-footer.md</key>
 		<dict>
 			<key>caret</key>
@@ -120,14 +138,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>1</integer>
+				<integer>10</integer>
 				<key>line</key>
-				<integer>2</integer>
+				<integer>214</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
-			<integer>0</integer>
+			<integer>60</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>180</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
@@ -137,6 +155,7 @@
 		<string>source/resources/header.md</string>
 		<string>source/resources/guide-header.md</string>
 		<string>source/resources/navigation.md</string>
+		<string>source/index.md</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>

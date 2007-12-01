@@ -62,6 +62,8 @@ There's also a handy [gzipped tar file][12].
 
 ### What is happening
 
+1 Dec 2007 - Added support for [array destructuring][array-bindings] (Thanks to Tamas Papp for the idea)
+
 15 Nov 2007 - New user guide; bind handles structures and property lists and is now extensible!
 
 13 Nov 2005 - Initial webpage n' stuff.
