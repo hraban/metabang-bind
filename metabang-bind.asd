@@ -35,3 +35,12 @@
                              'bind 'metatilities))) 
 
 
+#+asdf-system-connections 
+(asdf:defsystem-connection bind-and-cl-ppcre
+  :requires (metabang-bind cl-ppcre)
+  :components ((:module
+		"bind-and-cl-ppcre"
+		:pathname "dev/"
+		:components ((:file "bind-cl-ppcre")))))
+
+

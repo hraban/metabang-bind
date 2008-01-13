@@ -23,3 +23,13 @@
 				     (:file "plists")
 				     (:file "arrays"))))
   :depends-on (:metabang-bind :lift))
+
+#+asdf-system-connections 
+(asdf:defsystem-connection bind-and-cl-ppcre-test
+  :requires (metabang-bind-test cl-ppcre)
+  :components ((:module
+		"bind-and-cl-ppcre"
+		:pathname "unit-tests/"
+		:components ((:file "regex")))))
+
+
