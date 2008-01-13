@@ -33,10 +33,14 @@ DISCUSSION
 (defpackage #:metabang.bind
     (:use #:common-lisp)
     (:nicknames #:bind #:metabang-bind)
+    (:intern 
+     #:bind-generate-bindings
+     #:bind-filter-declarations
+     #:bind-macro-helper
+     #:bind-fix-nils)
     (:export 
      #:bind
      #:fluid-bind
-     #:bind-generate-bindings
 
      *bind-all-declarations*
      *bind-non-var-declarations*
@@ -44,6 +48,19 @@ DISCUSSION
 
      bind-error
      bind-keyword/optional-nil-with-default-error))
+
+(defpackage #:metabang.bind.developer
+    (:use #:common-lisp #:metabang-bind)
+    (:import-from #:metabang-bind
+		  #:bind-generate-bindings
+		  #:bind-filter-declarations
+		  #:bind-macro-helper
+		  #:bind-fix-nils)
+    (:export 
+     #:bind-generate-bindings
+     #:bind-filter-declarations
+     #:bind-macro-helper
+     #:bind-fix-nils))
 
 (in-package #:metabang.bind) 
            
