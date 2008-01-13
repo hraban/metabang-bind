@@ -38,7 +38,7 @@
 			<key>filename</key>
 			<string>source/user-guide.md</string>
 			<key>lastUsed</key>
-			<date>2007-12-01T23:36:02Z</date>
+			<date>2007-12-02T14:26:37Z</date>
 			<key>selected</key>
 			<true/>
 		</dict>
@@ -140,7 +140,7 @@
 				<key>column</key>
 				<integer>10</integer>
 				<key>line</key>
-				<integer>214</integer>
+				<integer>200</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>60</integer>

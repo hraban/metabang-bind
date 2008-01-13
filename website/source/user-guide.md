@@ -198,7 +198,7 @@ or that are different:
 
 ### Bind with arrays
 
-Tamas Padd had the idea of letting `bind` handle arrays too. For example, 
+Tamas Papp had the idea of letting `bind` handle arrays too. For example, 
 
     (bind ((#(a b c) #(1 2 3)))
       (list a b c))
