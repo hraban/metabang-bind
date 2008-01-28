@@ -296,12 +296,24 @@ in a binding is a list and the first item in the list is 'values'."
 	   remaining-bindings declarations body)))))
 
 (defmethod bind-generate-bindings 
-    ((kind (eql :accessors)) variable-form value-form
+    ((kind (eql :read-only-accessors)) variable-form value-form
      body declarations remaining-bindings)
-  (bind-handle-accessors variable-form value-form
+  (bind-handle-r/o-accessors variable-form value-form
 		     body declarations remaining-bindings))
 
-(defun bind-handle-accessors (variable-form value-form
+(defmethod bind-generate-bindings 
+    ((kind (eql :accessors-read-only)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-r/o-accessors variable-form value-form
+		     body declarations remaining-bindings))
+
+(defmethod bind-generate-bindings 
+    ((kind (eql :accessors-r/o)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-r/o-accessors variable-form value-form
+		     body declarations remaining-bindings))
+
+(defun bind-handle-r/o-accessors (variable-form value-form
 			      body declarations remaining-bindings)
   (let ((vars variable-form)
 	(class-gensym (gensym "class")))
@@ -316,6 +328,36 @@ in a binding is a list and the first item in the list is 'values'."
 	,(bind-filter-declarations declarations variable-form)
 	,@(bind-macro-helper 
 	   remaining-bindings declarations body)))))
+
+(defmethod bind-generate-bindings 
+    ((kind (eql :accessors)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-with-accessors variable-form value-form
+			      body declarations remaining-bindings))
+
+(defmethod bind-generate-bindings 
+    ((kind (eql :writable-accessors)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-with-accessors variable-form value-form
+			      body declarations remaining-bindings))
+
+(defun bind-handle-with-accessors
+    (variable-form value-form
+     body declarations remaining-bindings)
+  (let ((vars variable-form))
+    (assert vars)
+    `((with-accessors 
+	    (,@(loop for var in vars collect
+		    (let ((var-var (or (and (consp var) (first var))
+				       var))
+			  (var-accessor (or (and (consp var) (second var))
+					    var)))
+		      `(,var-var ,var-accessor))))
+	  ,value-form
+	,(bind-filter-declarations declarations variable-form)
+	,@(bind-macro-helper 
+	   remaining-bindings declarations body)))))
+
 
 ;;;;
 
