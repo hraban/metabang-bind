@@ -1,4 +1,4 @@
-;;;-*- Mode: Lisp; Package: BIND -*-
+;;;-*- Mode: Lisp; Package: bind -*-
 
 #| simple-header
 
@@ -18,9 +18,9 @@ See the file COPYING for details
      #:bind
      #:fluid-bind
 
-     *bind-all-declarations*
-     *bind-non-var-declarations*
-     *bind-lambda-list-markers*
+     #:*bind-all-declarations*
+     #:*bind-non-var-declarations*
+     #:*bind-lambda-list-markers*
 
      bind-error
      bind-keyword/optional-nil-with-default-error))
