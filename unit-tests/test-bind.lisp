@@ -77,3 +77,51 @@
 
 ;;;;
 
+(deftestsuite test-treat-values-as-values (metabang-bind-test)
+  ())
+
+(deftestsuite test-treat-values-as-values-true (test-treat-values-as-values)
+  ()
+  (:dynamic-variables 
+   (*bind-treat-values-as-values* t)))
+
+(addtest (test-treat-values-as-values-true)
+  generate-warning
+  (ensure-warning 
+    (macroexpand '(bind (((values a b) (foo)))
+		   (list a b)))))
+
+(addtest (test-treat-values-as-values-true)
+  generate-destructuring-if-atom
+  (ensure-same 
+   (eval '(let ((foo (list 0 1 2)))
+	   (bind (((values a b) foo))
+	     (list values a b))))
+   (list 0 1 2) :test 'equal))
+
+(addtest (test-treat-values-as-values-true)
+  generate-values-if-cons
+  (ensure-same 
+   (eval '(bind (((values a b) (values 1 2)))
+	     (list a b)))
+   (list 1 2) :test 'equal))
+
+(deftestsuite test-treat-values-as-values-false (test-treat-values-as-values)
+  ()
+  (:dynamic-variables 
+   (*bind-treat-values-as-values* nil)))
+
+(addtest (test-treat-values-as-values-false)
+  generate-no-warning
+  (handler-case
+      (macroexpand '(bind (((values a b) (foo)))
+		     (list a b)))
+    (warning (c) (declare (ignore c))
+	     (ensure nil))))
+
+(addtest (test-treat-values-as-values-false)
+  generate-destructuring-if-cons
+  (ensure-same 
+   (eval '(bind (((values a b) (list 0 1 2)))
+	     (list values a b)))
+   (list 0 1 2) :test 'equal))

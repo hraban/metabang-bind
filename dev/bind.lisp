@@ -22,8 +22,11 @@ See the file COPYING for details
      #:*bind-non-var-declarations*
      #:*bind-lambda-list-markers*
 
-     bind-error
-     bind-keyword/optional-nil-with-default-error))
+     ;; this will be removed ... someday
+     #:*bind-treat-values-as-values*
+
+     #:bind-error
+     #:bind-keyword/optional-nil-with-default-error))
 
 (defpackage #:metabang.bind.developer
     (:use #:common-lisp #:metabang-bind)
@@ -43,6 +46,24 @@ See the file COPYING for details
 (defparameter *bind-all-declarations*
   '(dynamic-extent ignore optimize ftype inline 
     special ignorable notinline type))
+
+(defparameter *bind-treat-values-as-values* t
+  "If true, then bind will treat cl:values in the first position of 
+a binding form as if it was :values and convert the binding form into
+a multipl-value-bind. If false, then bind will treat the binding form
+as a destructuring-bind and use values as a variable. E.g., if 
+\\*bind-treat-values-as-values\\* is true, then the following will
+not compile \(because values is not lexically bound\).
+
+    \(bind \(\(\(values a b\) \(foo\)\)\)
+      \(list values a b\)\)
+
+If \\*bind-treat-values-as-values\\* was nil, then the binding form
+would be converted into a destructuring-bind and all would be well.
+
+Bind's original behavior was as if this variable was set to true. At
+some point in the future, this variabe will vanish and bind will 
+always treat cl:values as destructuring.")
 
 (defparameter *bind-non-var-declarations*
   '(optimize ftype inline notinline))
@@ -79,7 +100,7 @@ See the file COPYING for details
 
 Simple bindings are as in let*. Destructuring is done if the first item
 in a binding is a list. Multiple value binding is done if the first item
-in a binding is a list and the first item in the list is 'values'."
+in a binding is a list and the first item in the list is ':values'."
   (let (declarations)
     (loop while (and (consp (car body)) (eq (caar body) 'declare)) do
           (push (first body) declarations)
@@ -136,6 +157,11 @@ in a binding is a list and the first item in the list is 'values'."
 
 (defmethod bind-generate-bindings ((kind cons) variable-form value-form
 				   body declarations remaining-bindings)
+  (bind-handle-destructuring variable-form value-form 
+			     body declarations remaining-bindings))
+
+(defun bind-handle-destructuring (variable-form value-form 
+				  body declarations remaining-bindings)
   (multiple-value-bind (vars ignores)
       (bind-fix-nils-destructured variable-form)
     `((destructuring-bind ,vars ,value-form
@@ -152,10 +178,14 @@ in a binding is a list and the first item in the list is 'values'."
 (defmethod bind-generate-bindings 
     ((kind (eql 'cl:values)) variable-form value-form
      body declarations remaining-bindings)
-  (if (consp variable-form)
-      (bind-handle-values variable-form value-form
-                          body declarations remaining-bindings)
-      (call-next-method)))
+  (cond ((and (consp value-form) *bind-treat-values-as-values*)	 
+	 (warn "The use of cl:values in smu:bind is deprecated. Please change to the unambiguous :values instead.")
+	 (bind-handle-values variable-form value-form
+			     body declarations remaining-bindings))
+	(t
+	 (bind-handle-destructuring (append (list kind) variable-form)
+				    value-form 
+				    body declarations remaining-bindings))))
 
 (defun bind-handle-values (variable-form value-form
 			   body declarations remaining-bindings)
