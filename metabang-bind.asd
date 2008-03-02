@@ -5,10 +5,10 @@
   (asdf:operate 'asdf:load-op 'asdf-system-connections))
 
 (defsystem metabang-bind
-  :version "0.6.5"
+  :version "0.7.0"
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
-  :description "Bind is a macro that generalizes multiple-value-bind, let, let* and destructuring-bind."
+  :description "Bind is a macro that generalizes multiple-value-bind, let, let*, destructuring-bind, structure and slot accessors, and a whole lot more."
   :components ((:module "dev"
 	            :components ((:file "bind"))))
   :depends-on (#+asdf-system-connections :asdf-system-connections)

@@ -95,7 +95,7 @@ always treat cl:values as destructuring.")
 
     \(bind \(\(a 2\)
            \(\(b &rest args &key \(c 2\) &allow-other-keys\) '\(:a :c 5 :d 10 :e 54\)\)
-           \(\(values d e\) \(truncate 4.5\)\)\)
+           \(\(:values d e\) \(truncate 4.5\)\)\)
          \(list a b c d e args\)\)
 
 Simple bindings are as in let*. Destructuring is done if the first item

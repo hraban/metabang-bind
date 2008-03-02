@@ -13,7 +13,7 @@
   :components ((:module "setup"
 			:pathname "unit-tests/"
                         :components ((:file "package")
-				     (:file "test-bind" 
+                                     (:file "test-bind" 
                                             :depends-on ("package"))))
                (:module "tests"
 			:pathname "unit-tests/"

@@ -38,12 +38,13 @@
 
 (addtest (test-classes)
   basic-accessors-r/o-2
-  (ensure-same
-   (bind ((obj (make-instance 'metabang-bind-class-2 :a 1 :b 2 :c 3 :d 4 :e 5))
-	  ((:accessors-read-only a c e) obj))
-     (setf a :a c :c)
-     (list (e obj) (c obj) (a obj)))
-   '(5 3 1) :test 'equal))
+  (bind ((obj (make-instance 'metabang-bind-class-2 :a 1 :b 2 :c 3 :d 4 :e 5))
+	 ((:accessors-read-only a c e) obj))
+    (setf a :a c :c)
+    (ensure-same (list a c e) '(:a :c 5) :test 'equal)
+    (ensure-same
+     (list (e obj) (c obj) (a obj))
+    '(5 3 1) :test 'equal)))
 
 (addtest (test-classes)
   accessors-new-variable-names-r/o
@@ -58,15 +59,6 @@
   (ensure-same
    (bind ((obj (make-instance 'metabang-bind-class-2 :a 1 :b 2 :c 3 :d 4 :e 5))
 	  ((:accessors a c e) obj))
-     (setf a :a c :c)
-     (list (e obj) (c obj) (a obj)))
-   '(5 :c :a) :test 'equal))
-
-(addtest (test-classes)
-  basic-accessors-1
-  (ensure-same
-   (bind ((obj (make-instance 'metabang-bind-class-2 :a 1 :b 2 :c 3 :d 4 :e 5))
-	  ((:writable-accessors a c e) obj))
      (setf a :a c :c)
      (list (e obj) (c obj) (a obj)))
    '(5 :c :a) :test 'equal))
