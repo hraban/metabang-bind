@@ -92,6 +92,20 @@
 		   (list a b)))))
 
 (addtest (test-treat-values-as-values-true)
+  generate-no-warning-on-simple-binding
+  (ensure-no-warning 
+    (macroexpand '(bind ((values 42))
+		   (list values)))))
+
+(addtest (test-treat-values-as-values-true)
+  generate-no-warning-on-simple-binding-works
+  (ensure-same
+   (eval '(bind ((values 42))
+	   (list values)))
+   '(42)
+   :test 'equal))
+
+(addtest (test-treat-values-as-values-true)
   generate-destructuring-if-atom
   (ensure-same 
    (eval '(let ((foo (list 0 1 2)))

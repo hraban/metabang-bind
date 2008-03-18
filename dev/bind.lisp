@@ -128,7 +128,7 @@ in a binding is a list and the first item in the list is ':values'."
 	     (rest variable-form)
 	     value-form body declarations remaining-bindings)
 	    (bind-generate-bindings
-	     variable-form
+	     nil
 	     variable-form
 	     value-form body declarations remaining-bindings)))
       body))
