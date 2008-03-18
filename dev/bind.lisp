@@ -128,7 +128,7 @@ in a binding is a list and the first item in the list is ':values'."
 	     (rest variable-form)
 	     value-form body declarations remaining-bindings)
 	    (bind-generate-bindings
-	     nil
+	     variable-form
 	     variable-form
 	     value-form body declarations remaining-bindings)))
       body))
@@ -148,7 +148,7 @@ in a binding is a list and the first item in the list is ':values'."
 				   body declarations remaining-bindings)
   (assert (not (keywordp kind))
 	  nil
-	  "Unable binding specification ~s" kind)
+	  "Unable to understand binding specification ~s" kind)
   `((let (,@(if value-form
 		`((,variable-form ,value-form))
 		`(,variable-form)))
@@ -178,7 +178,9 @@ in a binding is a list and the first item in the list is ':values'."
 (defmethod bind-generate-bindings 
     ((kind (eql 'cl:values)) variable-form value-form
      body declarations remaining-bindings)
-  (cond ((and (consp value-form) *bind-treat-values-as-values*)	 
+  (cond ((eq variable-form 'values)
+	 (call-next-method))
+	((and (consp value-form) *bind-treat-values-as-values*)	 
 	 (warn "The use of cl:values in smu:bind is deprecated. Please change to the unambiguous :values instead.")
 	 (bind-handle-values variable-form value-form
 			     body declarations remaining-bindings))
