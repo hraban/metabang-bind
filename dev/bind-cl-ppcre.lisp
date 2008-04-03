@@ -51,8 +51,8 @@
 	  (flet ((doit (,@vars)
 		   ,@(when ignores `((declare (ignore ,@ignores))))
 		   (return-from ,gblock
-		     ,@(bind-macro-helper
-			remaining-bindings declarations body))))
+		     (progn ,@(bind-macro-helper
+                       remaining-bindings declarations body)))))
 	    (cl-ppcre:register-groups-bind 
 		,vars (,regex ,value-form :sharedp t)
 	      ,(bind-filter-declarations
