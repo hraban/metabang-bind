@@ -75,6 +75,12 @@ always treat cl:values as destructuring.")
 (defparameter *bind-lambda-list-markers* 
   '(&key &body &rest &args &optional))
 
+(define-condition simple-style-warning (style-warning simple-warning)
+  ())
+
+(defun simple-style-warning (message &rest args)
+  (warn 'simple-style-warning :format-control message :format-arguments args))
+
 (define-condition bind-error (error)
                   ((binding
 		    :initform nil
@@ -180,8 +186,9 @@ in a binding is a list and the first item in the list is ':values'."
      body declarations remaining-bindings)
   (cond ((eq variable-form 'values)
 	 (call-next-method))
-	((and (consp value-form) *bind-treat-values-as-values*)	 
-	 (warn "The use of cl:values in smu:bind is deprecated. Please change to the unambiguous :values instead.")
+	((and (consp value-form) *bind-treat-values-as-values*)
+	 (simple-style-warning "The use of cl:values in bind is deprecated.
+Please change to the unambiguous :values instead.")
 	 (bind-handle-values variable-form value-form
 			     body declarations remaining-bindings))
 	(t
