@@ -115,9 +115,13 @@ in a binding is a list and the first item in the list is ':values'."
     (loop while (and (consp (car body)) (eq (caar body) 'declare)) do
           (push (first body) declarations)
           (setf body (rest body)))
-    (first (bind-macro-helper 
-            bindings 
-            (bind-expand-declarations (nreverse declarations)) body))))
+    (if bindings
+        (first (bind-macro-helper
+                bindings
+                (bind-expand-declarations (nreverse declarations)) body))
+        `(locally
+             ,@declarations
+           ,@body))))
 
 (defun bind-macro-helper (bindings declarations body)
   (if bindings
