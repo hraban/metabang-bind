@@ -264,6 +264,41 @@ Please change to the unambiguous :values instead.")
 (bind (((:plist a (b _) (c _ 2) (dd d)) '(:b "B" :a "A" :d "D")))
   (list a b c dd))
 
+(defmethod bind-generate-bindings ((kind (eql :assoc)) variable-form value-form
+				   body declarations remaining-bindings)
+  (bind-handle-assoc variable-form value-form
+		     body declarations remaining-bindings))
+
+(defun bind-handle-assoc (variable-form value-form
+			  body declarations remaining-bindings)
+  (let ((vars variable-form)
+	(assoc-gensym (gensym "assoc")))
+    (assert vars)
+    `((let* ((,assoc-gensym ,value-form)
+	     ,@(loop for spec in vars collect
+		    (let* ((spec (if (consp spec) spec (list spec)))
+			   (var-name (first spec))
+			   var-key var-default)
+		      (case (length spec)
+			(1 (setf var-key (first spec)))
+			(2 (setf var-key (second spec)))
+			(3 (setf var-key (second spec)
+				 var-default (third spec)))
+			(t
+			 (error "bad properly list variable specification: ~s" 
+				spec)))
+		      (when (string= (symbol-name var-key) "_")
+			(setf var-key var-name))
+		      `(,var-name (or (cdr (assoc ',var-key ,assoc-gensym)) 
+				      ,@(when var-default `(,var-default)))))))
+	,(bind-filter-declarations declarations variable-form)
+	,@(bind-macro-helper 
+	   remaining-bindings declarations body)))))
+
+#+(or)
+(bind (((:assoc a (b _) (c _ 2) (dd d)) '((b . "B") (a . "A") (d . "D"))))
+  (list a b c dd))
+
 (defmethod bind-generate-bindings 
     ((kind (eql :structure)) variable-form value-form
      body declarations remaining-bindings)
