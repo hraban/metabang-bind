@@ -209,22 +209,28 @@ Please change to the unambiguous :values instead.")
 (defmethod bind-generate-bindings ((kind (eql :plist)) variable-form value-form
 				   body declarations remaining-bindings)
   (bind-handle-plist variable-form value-form
-		     body declarations remaining-bindings))
+		     body declarations remaining-bindings t))
 
 (defmethod bind-generate-bindings ((kind (eql :property-list))
 				   variable-form value-form
 				   body declarations remaining-bindings)
   (bind-handle-plist variable-form value-form
-		     body declarations remaining-bindings))
+		     body declarations remaining-bindings t))
 
 (defmethod bind-generate-bindings ((kind (eql :properties))
 				   variable-form value-form
 				   body declarations remaining-bindings)
   (bind-handle-plist variable-form value-form
-		     body declarations remaining-bindings))
+		     body declarations remaining-bindings t))
+
+(defmethod bind-generate-bindings ((kind (eql :plist-)) variable-form value-form
+				   body declarations remaining-bindings)
+  (bind-handle-plist variable-form value-form
+		     body declarations remaining-bindings nil))
 
 (defun bind-handle-plist (variable-form value-form
-			  body declarations remaining-bindings)
+			  body declarations remaining-bindings
+			  form-keywords?)
   (let ((vars variable-form)
 	(plist-gensym (gensym "plist")))
     (assert vars)
@@ -243,8 +249,11 @@ Please change to the unambiguous :values instead.")
 				spec)))
 		      (when (string= (symbol-name var-key) "_")
 			(setf var-key var-name))
-		      (setf var-key (intern (symbol-name var-key) :keyword))
-		      `(,var-name (getf ,plist-gensym ,var-key 
+		      (when form-keywords?
+			(setf var-key (intern (symbol-name var-key) :keyword)))
+		      `(,var-name (getf ,plist-gensym 
+					,(if form-keywords? 
+					     var-key `',var-key)  
 					,@(when var-default
 						`(,var-default)))))))
 	,(bind-filter-declarations declarations variable-form)
