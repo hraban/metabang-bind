@@ -75,6 +75,10 @@ always treat cl:values as destructuring.")
 (defparameter *bind-lambda-list-markers* 
   '(&key &body &rest &args &optional))
 
+(defgeneric bind-generate-bindings (kind variable-form value-form
+					 body declarations remaining-bindings)
+  )
+
 (define-condition simple-style-warning (style-warning simple-warning)
   ())
 
