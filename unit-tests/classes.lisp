@@ -15,7 +15,7 @@
 (addtest (test-classes)
   basic-slots
   (ensure-same
-   (bind (((:slots a c)
+   (bind (((:slots-read-only a c)
 	   (make-instance 'metabang-bind-class-1 :a 1 :b 2 :c 3)))
      (list a c))
    '(1 3) :test 'equal))
@@ -23,7 +23,7 @@
 (addtest (test-classes)
   slots-new-variable-names
   (ensure-same
-   (bind (((:slots a (my-c c) (the-b b))
+   (bind (((:slots-read-only a (my-c c) (the-b b))
 	   (make-instance 'metabang-bind-class-1 :a 1 :b 2 :c 3)))
      (list a the-b my-c))
    '(1 2 3) :test 'equal))

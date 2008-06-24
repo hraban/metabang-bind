@@ -341,12 +341,18 @@ Please change to the unambiguous :values instead.")
 	   remaining-bindings declarations body)))))
 
 (defmethod bind-generate-bindings 
-    ((kind (eql :slots)) variable-form value-form
+    ((kind (eql :read-only-slots)) variable-form value-form
      body declarations remaining-bindings)
-  (bind-handle-slots variable-form value-form
-		     body declarations remaining-bindings))
+  (bind-handle-r/o-slots variable-form value-form
+                         body declarations remaining-bindings))
 
-(defun bind-handle-slots (variable-form value-form
+(defmethod bind-generate-bindings 
+    ((kind (eql :slots-read-only)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-r/o-slots variable-form value-form
+                         body declarations remaining-bindings))
+
+(defun bind-handle-r/o-slots (variable-form value-form
 			      body declarations remaining-bindings)
   (let ((vars variable-form)
 	(class-gensym (gensym "class")))
@@ -358,6 +364,28 @@ Please change to the unambiguous :values instead.")
 			  (var-slot (or (and (consp var) (second var))
 					var)))
 		      `(,var-var (slot-value ,class-gensym ',var-slot)))))
+	,(bind-filter-declarations declarations variable-form)
+	,@(bind-macro-helper 
+	   remaining-bindings declarations body)))))
+
+(defmethod bind-generate-bindings 
+    ((kind (eql :slots)) variable-form value-form
+     body declarations remaining-bindings)
+  (bind-handle-slots variable-form value-form
+		     body declarations remaining-bindings))
+
+(defun bind-handle-slots (variable-form value-form
+                          body declarations remaining-bindings)
+  (let ((vars variable-form))
+    (assert vars)
+    `((with-slots 
+	    (,@(loop for var in vars collect
+		    (let ((var-var (or (and (consp var) (first var))
+				       var))
+			  (var-accessor (or (and (consp var) (second var))
+					    var)))
+		      `(,var-var ,var-accessor))))
+	  ,value-form
 	,(bind-filter-declarations declarations variable-form)
 	,@(bind-macro-helper 
 	   remaining-bindings declarations body)))))
