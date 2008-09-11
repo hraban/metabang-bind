@@ -5,8 +5,6 @@
      body declarations remaining-bindings)
   ;; (:re "re" vars)
   (bind (((regex &rest vars) variable-form)
-	 (gok (gensym "ok"))
-	 (gblock (gensym "block"))
 	 ((:values vars ignores) (bind-fix-nils vars)))
     `((excl:re-let ,regex ,value-form
 	  ,(loop for var in vars for i from 1 collect
