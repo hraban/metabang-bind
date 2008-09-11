@@ -5,7 +5,7 @@
   (asdf:operate 'asdf:load-op 'asdf-system-connections))
 
 (defsystem metabang-bind
-  :version "0.7.2"
+  :version "0.7.3"
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let*, destructuring-bind, structure and slot accessors, and a whole lot more."
@@ -35,7 +35,6 @@
                               (symbol-name :export-exported-symbols)
                               'metatilities)
                              'bind 'metatilities))) 
-
 
 #+(and (not allegro) asdf-system-connections)
 (asdf:defsystem-connection bind-and-cl-ppcre
