@@ -9,9 +9,11 @@
   :author "Gary Warren King <gwking@metabang.com>"
   :licence "MIT License"    
   :description "Bind is a macro that generalizes multiple-value-bind, let, let*, destructuring-bind, structure and slot accessors, and a whole lot more."
-  :components ((:module "dev"
-	            :components ((:file "bind"))))
-  :depends-on (#+asdf-system-connections :asdf-system-connections)
+  :components ((:module
+		"dev"
+		:components
+		((:file "bind")
+		 (:file "bind-re-allegro" :depends-on ("bind")))))
   :in-order-to ((test-op (load-op metabang-bind-test)))
   :perform (test-op :after (op c)
 		    (funcall
@@ -35,7 +37,7 @@
                              'bind 'metatilities))) 
 
 
-#+asdf-system-connections 
+#+(and (not allegro) asdf-system-connections)
 (asdf:defsystem-connection bind-and-cl-ppcre
   :requires (metabang-bind cl-ppcre)
   :components ((:module
