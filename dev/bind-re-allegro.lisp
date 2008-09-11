@@ -5,15 +5,25 @@
      body declarations remaining-bindings)
   ;; (:re "re" vars)
   (bind (((regex &rest vars) variable-form)
+	 (gok (gensym "ok"))
+	 (gblock (gensym "block"))
 	 ((:values vars ignores) (bind-fix-nils vars)))
-    `((excl:re-let ,regex ,value-form
-	  ,(loop for var in vars for i from 1 collect
-		`(,var ,i))
-	(declare (ignore ,@ignores))
-	,(bind-filter-declarations
-	  declarations variable-form)
-	,@(bind-macro-helper
-	   remaining-bindings declarations body)))))
+    `((let ((,gok nil))
+	(block ,gblock
+	  (flet ((doit (,@vars)
+		   ,@(when ignores `((declare (ignore ,@ignores))))
+		   (return-from ,gblock
+		     (progn ,@(bind-macro-helper
+                       remaining-bindings declarations body)))))
+	    (excl:re-let ,regex ,value-form
+		,(loop for var in vars for i from 1 collect
+		      `(,var ,i))
+	      ,(bind-filter-declarations
+		declarations variable-form)
+	      (setf ,gok t)
+	      (doit ,@vars))
+	    (unless ,gok
+	      (doit ,@(make-list (length vars) :initial-element nil)))))))))
 
 #+(or)
 (bind (((:re "(\\w+)\\s+(\\w+)\\s+(\\d{1,2})\\.(\\d{1,2})\\.(\\d{4})"

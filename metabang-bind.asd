@@ -13,6 +13,7 @@
 		"dev"
 		:components
 		((:file "bind")
+		 #+allegro
 		 (:file "bind-re-allegro" :depends-on ("bind")))))
   :in-order-to ((test-op (load-op metabang-bind-test)))
   :perform (test-op :after (op c)
