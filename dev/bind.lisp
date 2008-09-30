@@ -545,9 +545,7 @@ Please change to the unambiguous :values instead.")
     (when declaration 
       `(declare ,@declaration))))
 
-;;; ---------------------------------------------------------------------------
 ;;; fluid-bind
-;;; ---------------------------------------------------------------------------
 
 (defmacro fluid-bind ((&rest bindings) &body body)
   "Fluid-bind is an extension of bind that handles setting and resetting places. For example, suppose that an object of class foo has a slot named bar whose value is currently 3. The following code would evaluate the inner body with bar bound to 17 and restore it when the inner body is exited. 
