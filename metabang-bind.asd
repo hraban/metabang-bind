@@ -11,8 +11,12 @@
   :description "Bind is a macro that generalizes multiple-value-bind, let, let*, destructuring-bind, structure and slot accessors, and a whole lot more."
   :components ((:module
 		"dev"
+		:serial t
 		:components
-		((:file "bind")
+		((:file "packages")
+		 (:file "macros")
+		 (:file "bind")
+		 (:file "binding-forms")
 		 #+allegro
 		 (:file "bind-re-allegro" :depends-on ("bind")))))
   :in-order-to ((test-op (load-op metabang-bind-test)))
