@@ -31,3 +31,7 @@
 \.cvsignore$
 (^|/)Thumbs\.db$
 (^|/)test-results($|/)
+\.dribble
+(^|/)make($|/)
+(^|/)benchmark-data($|/)
+(^|/)timeout($|/)
