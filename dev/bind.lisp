@@ -31,7 +31,9 @@ some point in the future, this variabe will vanish and bind will
 always treat cl:values as destructuring.")
 
 (defparameter *bind-non-var-declarations*
-  '(optimize ftype inline notinline))
+  '(optimize ftype inline notinline 
+    #+allegro
+    :explain))
 
 (defparameter *bind-simple-var-declarations*
   (remove 'type
