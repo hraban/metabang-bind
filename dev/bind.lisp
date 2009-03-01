@@ -195,7 +195,13 @@ in a binding is a list and the first item in the list is ':values'."
 				*bind-non-var-declarations*)
                         (and (member (first declaration)
 				     *bind-simple-var-declarations*)
-                             (member (second declaration) var-names))
+			     (member 
+			      (if (atom (second declaration))
+				  (second declaration)
+				  ;; ... (function foo) ...)
+			   	  (second (second declaration)))
+			      var-names))
+			;; type
                         (member (third declaration) var-names)) collect
                declaration))) 
     (when declaration 
