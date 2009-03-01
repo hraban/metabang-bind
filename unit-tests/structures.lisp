@@ -27,3 +27,11 @@
 	   (make-metabang-bind-test-1 :a 1 :b 2 :c 3)))
      (list c my-a))
    '(3 1) :test 'equal))
+
+(addtest (test-structures)
+  changed-variable-name-2
+  (ensure-same
+   (bind (((:structure metabang-bind-test-1- (my-a a) c)
+	   (make-metabang-bind-test-1 :a 1 :b 2 :c 3)))
+     (list c my-a))
+   '(3 1) :test 'equal))

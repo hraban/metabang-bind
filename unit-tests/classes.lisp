@@ -29,6 +29,15 @@
    '(1 2 3) :test 'equal))
 
 (addtest (test-classes)
+  writable-slots
+  (ensure-same
+   (bind ((instance (make-instance 'metabang-bind-class-1 :a 1 :b 2 :c 3))
+	  ((:slots a (my-c c) (the-b b)) instance))
+     (setf a :changed)
+     (list (slot-value instance 'a) the-b my-c))
+   '(:changed 2 3) :test 'equal))
+
+(addtest (test-classes)
   basic-accessors-r/o-1
   (ensure-same
    (bind (((:accessors-read-only a c e)
