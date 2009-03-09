@@ -116,7 +116,10 @@ Putting this altogether we can code the above let statement as:
 
 ### Bind with structures
 
-Structure fields are accessed using a concatenation of the structure's `conc-name` and the name of the field. Bind therefore needs to know two things: the conc-name and the field-names. The binding-form looks like
+Structure fields are accessed using a concatenation of the structure's
+`conc-name` and the name of the field. Bind therefore needs to know
+two things: the conc-name and the field-names. The binding-form looks
+like
 
     (:structure <conc-name> structure-spec*)
 

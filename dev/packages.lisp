@@ -38,5 +38,6 @@
      #:bind-generate-bindings
      #:bind-filter-declarations
      #:bind-macro-helper
-     #:bind-fix-nils))
+     #:bind-fix-nils
+     #:defbinding-form))
 

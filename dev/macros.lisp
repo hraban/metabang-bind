@@ -54,12 +54,15 @@ instead
     (flet ((form-keyword (name)
 	     (intern (symbol-name name)
 		     (load-time-value (find-package :keyword)))))
+      (setf name/s (if multiple-names? 
+		       (mapcar #'form-keyword name/s)
+		       (form-keyword name/s)))
       `(progn
 	 (setf (binding-form-docstring ',name/s) ,docstring)
 	 ,@(when multiple-names?
 		 (loop for name in name/s collect
 		      `(defmethod bind-generate-bindings 
-			   ((kind (eql ,(form-keyword name)))
+			   ((kind (eql ,name))
 			    variable-form value-form body declarations 
 			    remaining-bindings)
 			 (,main-method-name 
@@ -67,7 +70,7 @@ instead
 			  remaining-bindings))))
 	 (defmethod ,main-method-name 
 	     (,@(unless multiple-names?
-			`((kind (eql ,(form-keyword name/s)))))
+			`((kind (eql ,name/s))))
 	      variable-form value-form body declarations remaining-bindings)
 	   `((let ((values ,value-form))
 	       (,@,(if (symbolp (first body))
