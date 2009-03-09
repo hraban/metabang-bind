@@ -63,6 +63,26 @@ always treat cl:values as destructuring.")
              (format s "Bad binding '~S' in '~A'; cannot use a default value for &key or &optional arguments."
                      (bad-variable c) (binding c)))))
 
+(defun binding-forms ()
+  (let* ((forms (get 'bind :binding-forms)))
+    (sort (loop for form in forms collect (car form)) 'string-lessp)))
+
+(defun binding-form-groups ()
+  (let ((binding-forms (get 'bind :binding-forms))
+	(canonical-names
+	 (sort
+	  (delete-duplicates 
+	   (mapcar #'second (get 'bind :binding-forms)))
+	  #'string-lessp)))
+    (loop for form in canonical-names collect
+	 (cdr (assoc form binding-forms)))))
+
+(defun binding-form-synonyms (name)
+  (let* ((forms (get 'bind :binding-forms))
+	 (datum (assoc name forms)))
+    (and datum
+	 (rest datum))))
+
 (defmacro bind ((&rest bindings) &body body)
   "Bind is a replacement for let*, destructuring-bind and multiple-value-bind. An example is probably the best way to describe its syntax:
 

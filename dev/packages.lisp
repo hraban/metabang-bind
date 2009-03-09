@@ -12,6 +12,11 @@
      #:bind
      #:fluid-bind
 
+     #:binding-forms
+     #:binding-form-synonyms
+     #:binding-form-groups
+     #:binding-form-docstring
+
      #:*bind-all-declarations*
      #:*bind-non-var-declarations*
      #:*bind-lambda-list-markers*
