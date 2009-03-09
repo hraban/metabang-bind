@@ -1,7 +1,46 @@
 (in-package #:metabang.bind)
 
-(defmacro defbinding-form ((name/s &optional docstring) &body body)
-  (declare (ignorable docstring))
+#|
+
+use
+
+(defmethod documentation (object doc-type)
+  body...)
+
+instead
+
+(documentation :plist 'binding-form)
+
+|#
+(defun binding-form-docstring (name)
+  (let* ((docstrings (get 'bind :docstrings))
+	 (forms (get 'bind :binding-forms))
+	 (canonical-name (first (assoc name forms)))
+	 )
+    (and canonical-name
+	 (assoc canonical-name docstrings))))
+
+(defun (setf binding-form-docstring) (docstring name/s)
+  (when (atom name/s)
+    (setf name/s (list name/s)))
+  (let* ((docstrings (get 'bind :docstrings))
+	 (forms (get 'bind :binding-forms))
+	 (canonical-name (first name/s))
+	 (current-docstring-pair (assoc canonical-name docstrings)))
+    (loop for name in name/s do
+	 (let ((names-pair (assoc name forms)))
+	   (if names-pair
+	       (setf (cdr names-pair) name/s)
+	       (push (cons name name/s) forms))))
+    (if current-docstring-pair
+	(setf (cdr current-docstring-pair) docstring)
+	(push (cons canonical-name docstring) docstrings))
+    (setf (get 'bind :docstrings) docstrings)
+    (setf (get 'bind :binding-forms) forms)
+    docstring))
+
+(defmacro defbinding-form ((name/s &key docstring remove-nils-p) &body body)
+  (declare (ignorable remove-nils-p))
   (let ((multiple-names? (consp name/s))
 	(main-method-name nil)
 	#+(or)
@@ -16,6 +55,7 @@
 	     (intern (symbol-name name)
 		     (load-time-value (find-package :keyword)))))
       `(progn
+	 (setf (binding-form-docstring ',name/s) ,docstring)
 	 ,@(when multiple-names?
 		 (loop for name in name/s collect
 		      `(defmethod bind-generate-bindings 
