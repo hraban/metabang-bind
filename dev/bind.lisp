@@ -27,7 +27,7 @@ If \\*bind-treat-values-as-values\\* was nil, then the binding form
 would be converted into a destructuring-bind and all would be well.
 
 Bind's original behavior was as if this variable was set to true. At
-some point in the future, this variabe will vanish and bind will 
+some point in the future, this variable will vanish and bind will 
 always treat cl:values as destructuring.")
 
 (defparameter *bind-non-var-declarations*
@@ -139,7 +139,7 @@ in a binding is a list and the first item in the list is ':values'."
 	     variable-form
 	     variable-form
 	     value-form body declarations remaining-bindings)))
-      body))ma
+      body))
 
 ;;;;
 
