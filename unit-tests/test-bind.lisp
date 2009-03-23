@@ -139,3 +139,25 @@
    (eval '(bind (((values a b) (list 0 1 2)))
 	     (list values a b)))
    (list 0 1 2) :test 'equal))
+
+;;;;;;;
+
+(deftestsuite test-bind-style-warnings (metabang-bind-test)
+  ())
+
+(addtest (test-bind-style-warnings)
+  missing-value-1
+  (ensure-condition metabang-bind:bind-missing-value-form-warning
+    (macroexpand '(bind (((:values a b))) (list a b)))))
+
+(addtest (test-bind-style-warnings)
+  missing-value-2
+  (ensure-no-warning
+    (macroexpand '(bind (((:values a b) (foo))) (list a b)))))
+
+(addtest (test-bind-style-warnings)
+  missing-value-3
+  (ensure-no-warning
+    (macroexpand '(bind (a) (list a)))))
+
+

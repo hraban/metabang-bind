@@ -25,7 +25,8 @@
      #:*bind-treat-values-as-values*
 
      #:bind-error
-     #:bind-keyword/optional-nil-with-default-error))
+     #:bind-keyword/optional-nil-with-default-error
+     #:bind-missing-value-form-warning))
 
 (defpackage #:metabang.bind.developer
     (:use #:common-lisp #:metabang-bind)

@@ -48,6 +48,13 @@ always treat cl:values as destructuring.")
 (defun simple-style-warning (message &rest args)
   (warn 'simple-style-warning :format-control message :format-arguments args))
 
+(define-condition bind-missing-value-form-warning (simple-style-warning)
+  ((variable-form :initform nil
+		  :initarg :variable-form
+		  :reader variable-form))
+  (:report (lambda (c s)
+	     (format s "Missing value form for ~s" (variable-form c)))))
+
 (define-condition bind-error (error)
                   ((binding
 		    :initform nil
@@ -110,11 +117,15 @@ in a binding is a list and the first item in the list is ':values'."
   (if bindings
       (let ((binding (first bindings))
 	    (remaining-bindings (rest bindings))
-	    variable-form value-form)
+	    variable-form value-form atomp)
 	(if (consp binding)
 	    (setf variable-form (first binding)
-		  value-form (second binding))
-	    (setf variable-form binding))
+		  value-form (second binding)
+		  atomp nil)
+	    (setf variable-form binding
+		  atomp t))
+	(unless (or atomp value-form)
+	  (warn 'bind-missing-value-form-warning :variable-form variable-form))
 	(if (and (consp variable-form)
 		 (or (eq (first variable-form) 'cl:values)
 		     (and (symbolp (first variable-form))
