@@ -21,6 +21,13 @@
    '(1 3) :test 'equal))
 
 (addtest (test-structures)
+  no-capture
+  (let ((values 4))   
+    (bind (((:struct metabang-bind-test-1- a c)
+	    (make-metabang-bind-test-1 :a 1 :b 2 :c 3)))
+      (ensure-same '(4 1 3) (list values a c) :test 'equal))))
+
+(addtest (test-structures)
   changed-variable-name
   (ensure-same
    (bind (((:struct metabang-bind-test-1- (my-a a) c)

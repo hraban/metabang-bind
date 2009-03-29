@@ -72,13 +72,24 @@ instead
 	     (,@(unless multiple-names?
 			`((kind (eql ,name/s))))
 	      variable-form value-form body declarations remaining-bindings)
-	   `((let ((values ,value-form))
-	       (,@,(if (symbolp (first body))
-		       `(,(first body) variable-form 'values)
-		       `(funcall (lambda (variables values) ,@body)
-				 variable-form 'values))
+	   ,(if use-values-p
+		(let ((gvalues (gensym "values-")))
+		  ``((let ((,',gvalues ,value-form))
+		       (,@,(if (symbolp (first body))
+			       `(,(first body) variable-form ',gvalues)
+			       `(funcall (lambda (variables values) ,@body)
+					 variable-form ',gvalues))
 					;		 ,@(when ,gignores `((declare (ignore ,@gignores))))
-		   ,(bind-filter-declarations declarations variable-form)
-		   ,@(bind-macro-helper 
-		      remaining-bindings declarations body)))))))))
+			   ,@(bind-filter-declarations 
+			      declarations variable-form)
+			   ,@(bind-macro-helper 
+			      remaining-bindings declarations body)))))
+		``((,@,(if (symbolp (first body))
+			   `(,(first body) variable-form value-form)
+			   `(funcall (lambda (variables values) ,@body)
+				     variable-form value-form))
+		       ,@(bind-filter-declarations declarations variable-form)
+		       ,@(bind-macro-helper 
+			  remaining-bindings declarations body)))))))))
+
 
