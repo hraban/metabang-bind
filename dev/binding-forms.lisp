@@ -93,6 +93,43 @@ where each `structure-spec` is an atom or list with two elements:
 					 conc-name var-conc)) 
 				,values)))))))
 
+
+#|
+(defbinding-form (:function
+		  :docstring ""
+		  :use-values-p nil)
+  (destructuring-bind (name args) variables
+      `(labels ((,name ,args (progn ,values))))))
+
+(bind (((:function foo (x a)) (list a x))
+       ((:function bar (a)) (foo a a)))
+  (bar 3))
+
+(bind (((:function fib (x))
+	(cond ((< x 2) 1)
+	      (t (+ (fib (- x 1)) (fib (- x 2)))))))
+  (fib 5))
+
+1 1 2 3 5 
+
+;;; fails, need to combine like forms...
+(bind (((:function ep (x))
+	;;; failure, need to use rest instead of second in bind-macro-helper
+	(progn
+	  (print (list :e x))
+	  (if (= x 0) t (not (op (1- x))))))
+       ((:function op (x))
+	(progn
+	  (print (list :o x))
+	  (if (= x 1) t (not (ep (1- x)))))))
+  (ep 5))
+
+	(cond ((< x 2) 1)
+	      (t (+ (fib (- x 1)) (fib (- x 2)))))))
+  (fib 5))
+
+|#
+
 (defbinding-form ((:alist :assoc)
 		  :docstring
 "The binding form for association-list is as follows:
@@ -277,9 +314,9 @@ Putting this altogether we can code the above let statement as:
 This allows for the case when your property list uses symbols other than
 keywords as keys. For example:
 
-    (bind (((:plist- a b (c _ 34)) '(a 5 b 2)))
-      (list a b c))
-    ==> (5 2 34)
+    \(bind \(\(\(:plist- a b \(c _ 34\)\) '\(a 5 b 2\)\)\)
+      \(list a b c\)\)
+    ==> \(5 2 34\)
 
 "
 )
