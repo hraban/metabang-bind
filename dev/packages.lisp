@@ -16,6 +16,7 @@
      #:binding-form-synonyms
      #:binding-form-groups
      #:binding-form-docstring
+     #:binding-form			;for documentation
 
      #:*bind-all-declarations*
      #:*bind-non-var-declarations*

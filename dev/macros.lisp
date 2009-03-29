@@ -12,6 +12,10 @@ instead
 (documentation :plist 'binding-form)
 
 |#
+
+(defmethod documentation (what (doc-type (eql 'metabang.bind:binding-form)))
+  (binding-form-docstring what))
+
 (defun binding-form-docstring (name)
   (let* ((docstrings (get 'bind :docstrings))
 	 (forms (get 'bind :binding-forms))
