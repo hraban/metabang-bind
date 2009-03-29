@@ -42,28 +42,10 @@
 	,@(bind-macro-helper 
 	   remaining-bindings declarations body)))))
 
+#+(or)
+;; old
 (defmethod bind-generate-bindings ((kind (eql :values)) variable-form value-form
 				   body declarations remaining-bindings)
-  (bind-handle-values variable-form value-form
-		      body declarations remaining-bindings))
-
-(defmethod bind-generate-bindings 
-    ((kind (eql 'cl:values)) variable-form value-form
-     body declarations remaining-bindings)
-  (cond ((eq variable-form 'values)
-	 (call-next-method))
-	((and (consp value-form) *bind-treat-values-as-values*)
-	 (simple-style-warning "The use of cl:values in bind is deprecated.
-Please change to the unambiguous :values instead.")
-	 (bind-handle-values variable-form value-form
-			     body declarations remaining-bindings))
-	(t
-	 (bind-handle-destructuring (append (list kind) variable-form)
-				    value-form 
-				    body declarations remaining-bindings))))
-
-(defun bind-handle-values (variable-form value-form
-			   body declarations remaining-bindings)
   (multiple-value-bind (vars ignores)
       (bind-fix-nils variable-form)
     `((multiple-value-bind ,vars ,value-form
@@ -71,6 +53,14 @@ Please change to the unambiguous :values instead.")
 	,(bind-filter-declarations declarations variable-form)
 	,@(bind-macro-helper
 	   remaining-bindings declarations body)))))
+
+(defbinding-form (:values
+		  :docstring "" 
+		  :use-values-p nil)
+  (multiple-value-bind (vars ignores)
+      (bind-fix-nils variables)
+    `(multiple-value-bind ,vars ,values
+	,@(when ignores `((declare (ignore ,@ignores)))))))
 
 (defbinding-form ((:struct :structure)
 		  :docstring

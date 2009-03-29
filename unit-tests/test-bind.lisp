@@ -82,10 +82,12 @@
 
 (deftestsuite test-treat-values-as-values-true (test-treat-values-as-values)
   ()
+  (:documentation "treat-values-as-values is no longer supported.")
   (:dynamic-variables 
    (*bind-treat-values-as-values* t)))
 
-(addtest (test-treat-values-as-values-true)
+(addtest (test-treat-values-as-values-true
+	  :expected-failure t)
   generate-warning
   (ensure-warning 
     (macroexpand '(bind (((values a b) (foo)))
@@ -113,7 +115,8 @@
 	     (list values a b))))
    (list 0 1 2) :test 'equal))
 
-(addtest (test-treat-values-as-values-true)
+(addtest (test-treat-values-as-values-true
+	  :expected-error t)
   generate-values-if-cons
   (ensure-same 
    (eval '(bind (((values a b) (values 1 2)))

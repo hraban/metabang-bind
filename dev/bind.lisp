@@ -12,23 +12,11 @@ See the file COPYING for details
   '(dynamic-extent ignore optimize ftype inline 
     special ignorable notinline type))
 
-(defparameter *bind-treat-values-as-values* t
-  "If true, then bind will treat cl:values in the first position of 
-a binding form as if it was :values and convert the binding form into
-a multipl-value-bind. If false, then bind will treat the binding form
-as a destructuring-bind and use values as a variable. E.g., if 
-\\*bind-treat-values-as-values\\* is true, then the following will
-not compile \(because values is not lexically bound\).
-
-    \(bind \(\(\(values a b\) \(foo\)\)\)
-      \(list values a b\)\)
-
-If \\*bind-treat-values-as-values\\* was nil, then the binding form
-would be converted into a destructuring-bind and all would be well.
-
-Bind's original behavior was as if this variable was set to true. At
-some point in the future, this variable will vanish and bind will 
-always treat cl:values as destructuring.")
+;; tvav: change this
+(defparameter *bind-treat-values-as-values* nil
+  "**Deprecated** - this variable no longer has any effect on
+the parsing of a binding form. `bind` now requires that you use
+the `:values` form to request multiple-values.")
 
 (defparameter *bind-non-var-declarations*
   '(optimize ftype inline notinline 
@@ -128,10 +116,9 @@ in a binding is a list and the first item in the list is ':values'."
 	(unless (or atomp value-form)
 	  (warn 'bind-missing-value-form-warning :variable-form variable-form))
 	(if (and (consp variable-form)
-		 (or (eq (first variable-form) 'cl:values)
-		     (and (symbolp (first variable-form))
-			  (eq (symbol-package (first variable-form))
-			      (load-time-value (find-package :keyword))))))
+		 (and (symbolp (first variable-form))
+		      (eq (symbol-package (first variable-form))
+			  (load-time-value (find-package :keyword)))))
 	    (bind-generate-bindings 
 	     (first variable-form)
 	     (rest variable-form)
