@@ -24,7 +24,7 @@
   `((let (,@(if value-form
 		`((,variable-form ,value-form))
 		`(,variable-form)))
-      ,(bind-filter-declarations declarations variable-form)
+      ,@(bind-filter-declarations declarations variable-form)
       ,@(bind-macro-helper remaining-bindings declarations body))))
 
 (defmethod bind-generate-bindings ((kind cons) variable-form value-form
@@ -38,7 +38,7 @@
       (bind-fix-nils-destructured variable-form)
     `((destructuring-bind ,vars ,value-form
 	,@(when ignores `((declare (ignore ,@ignores))))
-	,(bind-filter-declarations declarations variable-form)
+	,@(bind-filter-declarations declarations variable-form)
 	,@(bind-macro-helper 
 	   remaining-bindings declarations body)))))
 
@@ -50,7 +50,7 @@
       (bind-fix-nils variable-form)
     `((multiple-value-bind ,vars ,value-form
 	,@(when ignores `((declare (ignore ,@ignores))))
-	,(bind-filter-declarations declarations variable-form)
+	,@(bind-filter-declarations declarations variable-form)
 	,@(bind-macro-helper
 	   remaining-bindings declarations body)))))
 

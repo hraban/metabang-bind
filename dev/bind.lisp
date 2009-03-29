@@ -224,7 +224,7 @@ in a binding is a list and the first item in the list is ':values'."
                         (member (third declaration) var-names)) collect
                declaration))) 
     (when declaration 
-      `(declare ,@declaration))))
+      `((declare ,@declaration)))))
 
 ;;; fluid-bind
 
