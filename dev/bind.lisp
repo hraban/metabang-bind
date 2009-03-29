@@ -120,10 +120,11 @@ in a binding is a list and the first item in the list is ':values'."
 	    variable-form value-form atomp)
 	(if (consp binding)
 	    (setf variable-form (first binding)
-		  value-form (second binding)
-		  atomp nil)
+		  value-form (second binding) ;; (rest binding)
+		  atomp (if (consp variable-form) nil (null value-form)))
 	    (setf variable-form binding
 		  atomp t))
+	;;(print (list :vf variable-form :value value-form :a atomp))
 	(unless (or atomp value-form)
 	  (warn 'bind-missing-value-form-warning :variable-form variable-form))
 	(if (and (consp variable-form)

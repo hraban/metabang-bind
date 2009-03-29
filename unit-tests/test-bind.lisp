@@ -160,4 +160,11 @@
   (ensure-no-warning
     (macroexpand '(bind (a) (list a)))))
 
+(addtest (test-bind-style-warnings)
+  missing-value-4
+  (ensure-no-warning
+    (macroexpand '(bind ((a nil)) (list a)))))
+
+
+
 
