@@ -34,4 +34,6 @@
 \.dribble
 (^|/)make($|/)
 (^|/)benchmark-data($|/)
-(^|/)timeout($|/)
+(^|/)test-report-.*($|/)
+(^)init-lisp.lisp$
+common-lisp\.net$
