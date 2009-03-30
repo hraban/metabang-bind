@@ -4,55 +4,26 @@
 					 body declarations remaining-bindings)
   )
 
-
-(defmethod bind-generate-bindings ((kind array) variable-form value-form
-				   body declarations remaining-bindings)
-  (let ((array-size (array-total-size variable-form))
-	(gvalue (gensym "value")))
-    `((let* ((,gvalue ,value-form)
-	    ,@(loop for i below array-size
-		 for var = (row-major-aref variable-form i)
+(defbinding-form (array
+		  :use-values-p t)
+  (let ((array-size (array-total-size variables)))
+    `(let* (,@(loop for i below array-size
+		 for var = (row-major-aref variables i)
 		 unless (eq var nil) collect
-		   `(,var (row-major-aref ,gvalue ,i))))
-      ,@(bind-macro-helper remaining-bindings declarations body)))))	
+		 `(,var (row-major-aref ,values ,i)))))))
 
-(defmethod bind-generate-bindings ((kind symbol) variable-form value-form
-				   body declarations remaining-bindings)
-  (assert (not (keywordp kind))
-	  nil
-	  "Unable to understand binding specification ~s" kind)
-  `((let (,@(if value-form
-		`((,variable-form ,value-form))
-		`(,variable-form)))
-      ,@(bind-filter-declarations declarations variable-form)
-      ,@(bind-macro-helper remaining-bindings declarations body))))
+(defbinding-form (symbol
+		  :use-values-p nil)
+  `(let (,@(if values
+	       `((,variables ,values))
+	       `(,variables)))))
 
-(defmethod bind-generate-bindings ((kind cons) variable-form value-form
-				   body declarations remaining-bindings)
-  (bind-handle-destructuring variable-form value-form 
-			     body declarations remaining-bindings))
-
-(defun bind-handle-destructuring (variable-form value-form 
-				  body declarations remaining-bindings)
+(defbinding-form (cons
+		  :use-values-p nil)
   (multiple-value-bind (vars ignores)
-      (bind-fix-nils-destructured variable-form)
-    `((destructuring-bind ,vars ,value-form
-	,@(when ignores `((declare (ignore ,@ignores))))
-	,@(bind-filter-declarations declarations variable-form)
-	,@(bind-macro-helper 
-	   remaining-bindings declarations body)))))
-
-#+(or)
-;; old
-(defmethod bind-generate-bindings ((kind (eql :values)) variable-form value-form
-				   body declarations remaining-bindings)
-  (multiple-value-bind (vars ignores)
-      (bind-fix-nils variable-form)
-    `((multiple-value-bind ,vars ,value-form
-	,@(when ignores `((declare (ignore ,@ignores))))
-	,@(bind-filter-declarations declarations variable-form)
-	,@(bind-macro-helper
-	   remaining-bindings declarations body)))))
+      (bind-fix-nils-destructured variables)
+    `(destructuring-bind ,vars ,values
+	,@(when ignores `((declare (ignore ,@ignores)))))))
 
 (defbinding-form (:values
 		  :docstring "" 
@@ -194,7 +165,7 @@ variant that provides only read-write access to the class."
 				     var)))
 		   `(,var-var (slot-value ,values ',var-slot)))))))
 
-(defbinding-form (slots
+(defbinding-form (:slots
 		  :docstring 
 		  "The `:slots` binding form is short hand for the `with-slots` macro.
 
