@@ -43,12 +43,16 @@ instead
     (setf (get 'bind :binding-forms) forms)
     docstring))
 
-(defmacro defbinding-form ((name/s &key docstring remove-nils-p) &body body)
-  (declare (ignorable remove-nils-p))
-  (let ((multiple-names? (consp name/s))
-	(main-method-name nil)
-	#+(or)
-	(gignores (gensym "ignores")))    
+(defmacro defbinding-form ((name/s &key docstring remove-nils-p
+				   description (use-values-p t)) &body body)
+  (declare (ignorable remove-nils-p description))
+  (let* ((multiple-names? (consp name/s))
+	 (main-method-name nil)
+	 (force-keyword? (or multiple-names?
+			     (eq (symbol-package name/s) 
+				 (load-time-value (find-package :keyword)))))
+	 #+(or)
+	 (gignores (gensym "ignores")))    
     (cond (multiple-names?
 	   (setf main-method-name (gensym "binding-generator"))
 	   )
@@ -58,9 +62,10 @@ instead
     (flet ((form-keyword (name)
 	     (intern (symbol-name name)
 		     (load-time-value (find-package :keyword)))))
-      (setf name/s (if multiple-names? 
-		       (mapcar #'form-keyword name/s)
-		       (form-keyword name/s)))
+      (when force-keyword?
+	(setf name/s (if multiple-names? 
+			 (mapcar #'form-keyword name/s)
+			 (form-keyword name/s))))
       `(progn
 	 (setf (binding-form-docstring ',name/s) ,docstring)
 	 ,@(when multiple-names?
@@ -74,7 +79,9 @@ instead
 			  remaining-bindings))))
 	 (defmethod ,main-method-name 
 	     (,@(unless multiple-names?
-			`((kind (eql ,name/s))))
+			(if force-keyword?
+			    `((kind (eql ,name/s)))
+			    `((kind ,name/s))))
 	      variable-form value-form body declarations remaining-bindings)
 	   ,(if use-values-p
 		(let ((gvalues (gensym "values-")))
