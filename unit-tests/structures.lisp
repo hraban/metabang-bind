@@ -42,3 +42,24 @@
 	   (make-metabang-bind-test-1 :a 1 :b 2 :c 3)))
      (list c my-a))
    '(3 1) :test 'equal))
+
+(addtest (test-structures)
+  nested-read-only
+  (let ((c1 (make-metabang-bind-test-1 :a 1 :b 2 :c 3))
+	(c2 (make-metabang-bind-test-1 :a 4 :b 5 :c 6)))
+    (ensure-same
+     (bind (((:structure metabang-bind-test-1- (my-a a) c) c1)
+	    ((:structure metabang-bind-test-1- a b (second-c c)) c2))
+       (list my-a c a b second-c))
+     '(1 3 4 5 6) :test 'equal)))
+
+(addtest (test-structures)
+  read-write-nested
+  (let ((c1 (make-metabang-bind-test-1 :a 1 :b 2 :c 3))
+	(c2 (make-metabang-bind-test-1 :a 4 :b 5 :c 6)))
+    (bind (((:structure/rw metabang-bind-test-1- (my-a a) c) c1)
+	   ((:structure/rw metabang-bind-test-1- a b (second-c c)) c2))
+      (setf my-a :a second-c :c b :b))
+    (ensure-same (metabang-bind-test-1-a c1) :a)
+    (ensure-same (metabang-bind-test-1-b c2) :b)
+    (ensure-same (metabang-bind-test-1-c c2) :c)))

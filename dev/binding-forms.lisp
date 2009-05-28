@@ -64,6 +64,35 @@ where each `structure-spec` is an atom or list with two elements:
 					 conc-name var-conc)) 
 				,values)))))))
 
+(defbinding-form ((:structure/rw)
+		  :docstring
+		  "Structure fields are accessed using a concatenation
+of the structure's `conc-name` and the name of the field. Bind
+therefore needs to know two things: the conc-name and the
+field-names. The binding-form looks like
+
+    (:structure <conc-name> structure-spec*)
+
+where each `structure-spec` is an atom or list with two elements:
+
+* an atom specifies both the name of the variable to which the
+  structure field is bound and the field-name in the structure.
+
+* a list has the variable name as its first item and the structure
+  field name as its second.
+")
+  (let ((conc-name (first variables))
+	(vars (rest variables)))
+    (assert conc-name)
+    (assert vars)
+    `(symbol-macrolet ,(loop for var in vars collect
+			    (let ((var-var (or (and (consp var) (first var))
+					       var))
+				  (var-conc (or (and (consp var) (second var))
+						var)))
+			      `(,var-var (,(intern 
+					    (format nil "~a~a" conc-name var-conc)) 
+					   ,values)))))))
 
 #|
 (defbinding-form (:function
