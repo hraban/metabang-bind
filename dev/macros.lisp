@@ -84,12 +84,13 @@ instead
 			    `((kind ,name/s))))
 	      variable-form value-form body declarations remaining-bindings)
 	   ,(if use-values-p
-		(let ((gvalues (gensym "values-")))
-		  ``((let ((,',gvalues ,value-form))
+		;; surely this could be simpler!
+		`(let ((gvalues (next-value "values-")))
+		   `((let ((,gvalues ,value-form))
 		       (,@,(if (symbolp (first body))
-			       `(,(first body) variable-form ',gvalues)
+			       `(,(first body) variable-form gvalues)
 			       `(funcall (lambda (variables values) ,@body)
-					 variable-form ',gvalues))
+					 variable-form gvalues))
 					;		 ,@(when ,gignores `((declare (ignore ,@gignores))))
 			   ,@(bind-filter-declarations 
 			      declarations variable-form)
@@ -103,4 +104,6 @@ instead
 		       ,@(bind-macro-helper 
 			  remaining-bindings declarations body)))))))))
 
+(defun next-value (x)
+  (gensym x))
 
