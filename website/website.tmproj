@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>source/resources/header.md</string>
+	<string>source/index.md</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -18,7 +18,9 @@
 			<key>filename</key>
 			<string>source/index.md</string>
 			<key>lastUsed</key>
-			<date>2007-12-01T23:36:02Z</date>
+			<date>2009-05-29T12:50:08Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>expanded</key>
@@ -50,14 +52,28 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>68</integer>
+				<integer>50</integer>
 				<key>line</key>
-				<integer>64</integer>
+				<integer>69</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>42</integer>
+			<integer>41</integer>
+		</dict>
+		<key>source/resources/footer.md</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>6</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>source/resources/guide-footer.md</key>
 		<dict>
@@ -108,14 +124,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>10</integer>
+				<integer>71</integer>
 				<key>line</key>
-				<integer>6</integer>
+				<integer>25</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>58</integer>
+				<key>line</key>
+				<integer>25</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>71</integer>
+				<key>line</key>
+				<integer>25</integer>
+			</dict>
 		</dict>
 		<key>source/resources/navigation.md</key>
 		<dict>
@@ -125,6 +157,20 @@
 				<integer>0</integer>
 				<key>line</key>
 				<integer>3</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>source/resources/shared.md</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>15</integer>
+				<key>line</key>
+				<integer>5</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -151,6 +197,8 @@
 		<string>source/user-guide.md</string>
 		<string>source/resources/guide-footer.md</string>
 		<string>source/resources/header.md</string>
+		<string>source/resources/footer.md</string>
+		<string>source/resources/shared.md</string>
 		<string>source/resources/guide-header.md</string>
 		<string>source/resources/navigation.md</string>
 		<string>source/index.md</string>
@@ -158,6 +206,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{142, 70}, {578, 788}}</string>
+	<string>{{2, 90}, {578, 788}}</string>
 </dict>
 </plist>

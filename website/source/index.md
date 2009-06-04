@@ -23,17 +23,26 @@
 
 ### What it is
 
-Bind combines _let_, _destructuring-bind_ and _multiple-value-bind_ and a whole lot more into a single form. The [user guide][user-guide] has all the details but here is example to whet your appetite:
-    
+Bind extends the idea of of `let` and destructing to provide
+a uniform syntax for all your accessor needs. It combines
+_let_, _destructuring-bind_, `with-slots`, `with-accessors`,
+structure editing, property or association-lists, and
+_multiple-value-bind_ and a whole lot more into a single
+form. The [user guide][user-guide] has all the details but
+here is example to whet your appetite:
+
     (bind ((a 2)
            ((b &rest args &key (c 2) &allow-other-keys) '(:a :c 5 :d 10 :e 54))
            ((:values d e) (truncate 4.5)))
       (list a b c d e args))
     ==> (2 :A 5 4 0.5 (:C 5 :D 10 :E 54))
 
-Bind is especially handy when you have more than one layer of multiple-value-bind or destructuring-bind. Since bind is a single form, you don't end up too far off to the right in editor land.
+Bind is especially handy when you have more than one layer of
+`multiple-value-bind` or `destructuring-bind`. Since `bind` is a
+single form, you don't end up too far off to the right in
+editor land.
 
-Bind is released under the MIT license.
+Bind is released under the [MIT license][mit-license].
 
 {anchor mailing-lists}
 
@@ -45,26 +54,28 @@ Use the developer [mailing list][metabang-bind-devel] for any questions or comme
 
 ### Where is it
 
-A [Darcs][] repository is available. The command to get bind is:
+A [darcs][] repository is available. The command to get bind is:
 
     darcs get http://common-lisp.net/project/metabang-bind/
 
-metabang-bind is also [ASDF installable][10]. Its CLiki home is right [where][11] you'd expect.
+metabang-bind is also [ASDF installable][asdf-install]. Its
+CLiki home is right [where][cliki-home] you'd expect.
 
-   [10]: http://www.cliki.net/asdf-install
-   [11]: http://www.cliki.net/bind
-
-There's also a handy [gzipped tar file][12].
-
-   [12]: http://common-lisp.net/project/cl-containers/metabang-bind/metabang-bind_latest.tar.gz
+There's also a handy [gzipped tar file][tarball].
 
 {anchor news}
 
 ### What is happening
 
-1 Dec 2007 - Added support for [array destructuring][array-bindings] (Thanks to Tamas Papp for the idea)
+28 May 2009 - added `:structure/rw` binding form; updated
+webpage to link to the user's guide
 
-15 Nov 2007 - New user guide; bind handles structures and property lists and is now extensible!
+1 Dec 2007 - Added support for [array
+destructuring][array-bindings] (Thanks to Tamas Papp for the
+idea)
+
+15 Nov 2007 - New user guide; bind handles structures and
+property lists and is now extensible!
 
 13 Nov 2005 - Initial webpage n' stuff.
 
