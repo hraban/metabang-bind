@@ -68,9 +68,9 @@ instead
 			 (form-keyword name/s))))
       `(progn
 	 (setf (binding-form-docstring ',name/s) ,docstring)
-	 (defgeneric ,main-method-name	     
-	     (kind variable-form value-form body
-		   declarations remaining-bindings))
+	 (defgeneric ,main-method-name
+	     (,@(unless multiple-names? `(kind)) variable-form value-form body
+		declarations remaining-bindings))
 	 (defmethod ,main-method-name 
 	     (,@(unless multiple-names?
 			(if force-keyword?
