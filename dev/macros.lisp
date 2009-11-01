@@ -68,15 +68,9 @@ instead
 			 (form-keyword name/s))))
       `(progn
 	 (setf (binding-form-docstring ',name/s) ,docstring)
-	 ,@(when multiple-names?
-		 (loop for name in name/s collect
-		      `(defmethod bind-generate-bindings 
-			   ((kind (eql ,name))
-			    variable-form value-form body declarations 
-			    remaining-bindings)
-			 (,main-method-name 
-			  variable-form value-form body declarations 
-			  remaining-bindings))))
+	 (defgeneric ,main-method-name	     
+	     (kind variable-form value-form body
+		   declarations remaining-bindings))
 	 (defmethod ,main-method-name 
 	     (,@(unless multiple-names?
 			(if force-keyword?
@@ -102,7 +96,16 @@ instead
 				     variable-form value-form))
 		       ,@(bind-filter-declarations declarations variable-form)
 		       ,@(bind-macro-helper 
-			  remaining-bindings declarations body)))))))))
+			  remaining-bindings declarations body)))))
+	 ,@(when multiple-names?
+		 (loop for name in name/s collect
+		      `(defmethod bind-generate-bindings 
+			   ((kind (eql ,name))
+			    variable-form value-form body declarations 
+			    remaining-bindings)
+			 (,main-method-name 
+			  variable-form value-form body declarations 
+			  remaining-bindings))))))))
 
 (defun next-value (x)
   (gensym x))
