@@ -1,9 +1,6 @@
 (defpackage #:metabang.bind-system (:use #:cl #:asdf))
 (in-package #:metabang.bind-system)
 
-(when (find-system 'asdf-system-connections nil)
-  (asdf:operate 'asdf:load-op 'asdf-system-connections))
-
 (defsystem metabang-bind
   :version "0.7.4"
   :author "Gary Warren King <gwking@metabang.com>"
@@ -29,25 +26,6 @@
 (defmethod operation-done-p 
            ((o test-op) (c (eql (find-system 'metabang-bind))))
   (values nil))
-
-#+asdf-system-connections 
-(asdf:defsystem-connection bind-and-metatilities
-  :requires (metabang-bind metatilities-base)
-  :perform (load-op :after (op c)
-                    (use-package (find-package 'metabang.bind) 
-                                 (find-package 'metatilities))
-                    (funcall (intern 
-                              (symbol-name :export-exported-symbols)
-                              'metatilities)
-                             'bind 'metatilities))) 
-
-#+(and (not allegro) asdf-system-connections)
-(asdf:defsystem-connection bind-and-cl-ppcre
-  :requires (metabang-bind cl-ppcre)
-  :components ((:module
-		"bind-and-cl-ppcre"
-		:pathname "dev/"
-		:components ((:file "bind-cl-ppcre")))))
 
 
 
