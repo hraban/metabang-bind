@@ -44,7 +44,8 @@ instead
     docstring))
 
 (defmacro defbinding-form ((name/s &key docstring remove-nils-p
-				   description (use-values-p t)) &body body)
+				   description (use-values-p t)
+				   (accept-multiple-values-p nil)) &body body)
   (declare (ignorable remove-nils-p description))
   (let* ((multiple-names? (consp name/s))
 	 (main-method-name nil)
@@ -75,7 +76,9 @@ instead
 			    variable-form value-form body declarations 
 			    remaining-bindings)
 			 (,main-method-name 
-			  variable-form value-form body declarations 
+			  variable-form
+			  ,(if accept-multiple-values-p `value-form `(first value-form))
+			  body declarations 
 			  remaining-bindings))))
 	 (defmethod ,main-method-name 
 	     (,@(unless multiple-names?
@@ -86,7 +89,7 @@ instead
 	   ,(if use-values-p
 		;; surely this could be simpler!
 		`(let ((gvalues (next-value "values-")))
-		   `((let ((,gvalues ,value-form))
+		   `((let ((,gvalues ,,(if accept-multiple-values-p `value-form `(first value-form))))
 		       (,@,(if (symbolp (first body))
 			       `(,(first body) variable-form gvalues)
 			       `(funcall (lambda (variables values) ,@body)
@@ -97,9 +100,9 @@ instead
 			   ,@(bind-macro-helper 
 			      remaining-bindings declarations body)))))
 		``((,@,(if (symbolp (first body))
-			   `(,(first body) variable-form value-form)
+			   `(,(first body) variable-form ,(if accept-multiple-values-p `value-form `(first value-form)))
 			   `(funcall (lambda (variables values) ,@body)
-				     variable-form value-form))
+				     variable-form ,(if accept-multiple-values-p `value-form `(first value-form))))
 		       ,@(bind-filter-declarations declarations variable-form)
 		       ,@(bind-macro-helper 
 			  remaining-bindings declarations body)))))))))

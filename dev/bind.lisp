@@ -108,7 +108,7 @@ in a binding is a list and the first item in the list is ':values'."
 	    variable-form value-form atomp)
 	(if (consp binding)
 	    (setf variable-form (first binding)
-		  value-form (second binding) ;; (rest binding)
+		  value-form (rest binding) ;; (second binding)
 		  atomp (if (consp variable-form) nil (null value-form)))
 	    (setf variable-form binding
 		  atomp t))

@@ -14,9 +14,18 @@
 
 (defbinding-form (symbol
 		  :use-values-p nil)
-  `(let (,@(if values
-	       `((,variables ,values))
-	       `(,variables)))))
+  (if (keywordp kind)
+      (error "Don't have a binding form for ~s" kind)
+      `(let (,@(if values
+		   `((,variables ,values))
+		   `(,variables))))))
+
+(defbinding-form (:flet
+		  :docstring ""
+		  :use-values-p nil
+		  :accept-multiple-values-p t)
+  (destructuring-bind (name args) variables
+      `(flet ((,name ,args (progn ,@values))))))
 
 (defbinding-form (cons
 		  :use-values-p nil)
