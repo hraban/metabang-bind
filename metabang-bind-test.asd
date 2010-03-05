@@ -21,7 +21,8 @@
                         :components ((:file "structures")
 				     (:file "classes")
 				     (:file "plists")
-				     (:file "arrays"))))
+				     (:file "arrays")
+				     (:file "functions"))))
   :depends-on (:metabang-bind :lift))
 
 #+asdf-system-connections 

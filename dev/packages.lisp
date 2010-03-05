@@ -27,7 +27,8 @@
 
      #:bind-error
      #:bind-keyword/optional-nil-with-default-error
-     #:bind-missing-value-form-warning))
+     #:bind-missing-value-form-warning
+     #:bind-too-many-value-forms-error))
 
 (defpackage #:metabang.bind.developer
     (:use #:common-lisp #:metabang-bind)

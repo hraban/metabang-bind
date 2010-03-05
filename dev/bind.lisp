@@ -7,7 +7,14 @@ See the file COPYING for details
 |#
 
 (in-package #:metabang.bind) 
-           
+    
+(defgeneric binding-form-accepts-multiple-forms-p (binding-form)
+  (:documentation "Returns true if a binding form can accept multiple forms
+(e.g., :flet)"))
+
+(defmethod binding-form-accepts-multiple-forms-p ((binding-form t))
+  nil)
+
 (defparameter *bind-all-declarations*
   '(dynamic-extent ignore optimize ftype inline 
     special ignorable notinline type))
@@ -42,6 +49,16 @@ the `:values` form to request multiple-values.")
 		  :reader variable-form))
   (:report (lambda (c s)
 	     (format s "Missing value form for ~s" (variable-form c)))))
+
+(define-condition bind-too-many-value-forms-error (error)
+  ((variable-form :initform nil
+		  :initarg :variable-form
+		  :reader variable-form)
+   (value-form :initform nil
+		  :initarg :value-form
+		  :reader value-form))
+  (:report (lambda (c s)
+	     (format s "Two many value forms for ~s" (variable-form c)))))
 
 (define-condition bind-error (error)
                   ((binding
@@ -105,20 +122,28 @@ in a binding is a list and the first item in the list is ':values'."
   (if bindings
       (let ((binding (first bindings))
 	    (remaining-bindings (rest bindings))
-	    variable-form value-form atomp)
+	    variable-form value-form atomp binding-form)
 	(if (consp binding)
 	    (setf variable-form (first binding)
-		  value-form (second binding) ;; (rest binding)
+		  value-form (rest binding) ;; (second binding)
 		  atomp (if (consp variable-form) nil (null value-form)))
 	    (setf variable-form binding
 		  atomp t))
-	;;(print (list :vf variable-form :value value-form :a atomp))
 	(unless (or atomp value-form)
 	  (warn 'bind-missing-value-form-warning :variable-form variable-form))
-	(if (and (consp variable-form)
-		 (and (symbolp (first variable-form))
-		      (eq (symbol-package (first variable-form))
-			  (load-time-value (find-package :keyword)))))
+	(setf binding-form (and (consp variable-form)
+				(and (symbolp (first variable-form))
+				     (eq (symbol-package (first variable-form))
+					 (load-time-value (find-package :keyword)))
+				     (first variable-form))))
+	(when (and (consp value-form) 
+		   (cdr value-form)
+		   (or (null binding-form)
+		       (not (binding-form-accepts-multiple-forms-p binding-form))))
+	  (error 'bind-too-many-value-forms-error 
+		:variable-form variable-form :value-form value-form))
+	;;(print (list :vf variable-form :value value-form :a atomp :b binding-form))
+	(if binding-form
 	    (bind-generate-bindings 
 	     (first variable-form)
 	     (rest variable-form)

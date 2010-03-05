@@ -44,7 +44,8 @@ instead
     docstring))
 
 (defmacro defbinding-form ((name/s &key docstring remove-nils-p
-				   description (use-values-p t)) &body body)
+				   description (use-values-p t)
+				   (accept-multiple-forms-p nil)) &body body)
   (declare (ignorable remove-nils-p description))
   (let* ((multiple-names? (consp name/s))
 	 (main-method-name nil)
@@ -68,9 +69,11 @@ instead
 			 (form-keyword name/s))))
       `(progn
 	 (setf (binding-form-docstring ',name/s) ,docstring)
-	 (defgeneric ,main-method-name
-	     (,@(unless multiple-names? `(kind)) variable-form value-form body
-		declarations remaining-bindings))
+	 ,@(loop for name in (if multiple-names? name/s (list name/s)) 
+	       when (keywordp name) collect
+		`(defmethod binding-form-accepts-multiple-forms-p 
+		      ((binding-form (eql ,name)))
+		    ,accept-multiple-forms-p))
 	 (defmethod ,main-method-name 
 	     (,@(unless multiple-names?
 			(if force-keyword?
@@ -80,7 +83,9 @@ instead
 	   ,(if use-values-p
 		;; surely this could be simpler!
 		`(let ((gvalues (next-value "values-")))
-		   `((let ((,gvalues ,value-form))
+		   `((let ((,gvalues ,,(if accept-multiple-forms-p 
+					   `value-form
+					   `(first value-form))))
 		       (,@,(if (symbolp (first body))
 			       `(,(first body) variable-form gvalues)
 			       `(funcall (lambda (variables values) ,@body)
@@ -91,9 +96,13 @@ instead
 			   ,@(bind-macro-helper 
 			      remaining-bindings declarations body)))))
 		``((,@,(if (symbolp (first body))
-			   `(,(first body) variable-form value-form)
+			   `(,(first body) variable-form ,(if accept-multiple-forms-p
+							      `value-form
+							      `(first value-form)))
 			   `(funcall (lambda (variables values) ,@body)
-				     variable-form value-form))
+				     variable-form ,(if accept-multiple-forms-p
+							`value-form
+							`(first value-form))))
 		       ,@(bind-filter-declarations declarations variable-form)
 		       ,@(bind-macro-helper 
 			  remaining-bindings declarations body)))))
@@ -105,7 +114,20 @@ instead
 			    remaining-bindings)
 			 (,main-method-name 
 			  variable-form value-form body declarations 
-			  remaining-bindings))))))))
+			  remaining-bindings))))
+	 #+(or)
+	 ,@(when multiple-names?
+		 (loop for name in name/s collect
+		      `(defmethod bind-generate-bindings 
+			   ((kind (eql ,name))
+			    variable-form value-form body declarations 
+			    remaining-bindings)
+			 (,main-method-name 
+			  variable-form
+			  ,(if accept-multiple-forms-p `value-form `(first value-form))
+			  body declarations 
+			  remaining-bindings))))
+	 ))))
 
 (defun next-value (x)
   (gensym x))

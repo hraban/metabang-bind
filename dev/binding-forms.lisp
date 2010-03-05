@@ -14,9 +14,28 @@
 
 (defbinding-form (symbol
 		  :use-values-p nil)
-  `(let (,@(if values
-	       `((,variables ,values))
-	       `(,variables)))))
+  (if (keywordp kind)
+      (error "Don't have a binding form for ~s" kind)
+      `(let (,@(if values
+		   `((,variables ,values))
+		   `(,variables))))))
+
+(defbinding-form (:flet
+		  :docstring "Local functions are defined using
+
+    \(:flet <name> \(<lambda list>\) <function definition>\)
+
+When the function definition occurs in a progn. For example:
+
+    \(bind \(\(\(:flet double-list \(x\)\) \(setf x \(* 2 x\)\) \(list x x\)\)\)
+        \(double-list 45\)\)
+    ==> (90 90)
+
+"
+		  :use-values-p nil
+		  :accept-multiple-forms-p t)
+  (destructuring-bind (name args) variables
+      `(flet ((,name ,args (progn ,@values))))))
 
 (defbinding-form (cons
 		  :use-values-p nil)

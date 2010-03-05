@@ -168,6 +168,15 @@
   (ensure-no-warning
     (macroexpand '(bind ((a nil)) (list a)))))
 
+(addtest (test-bind-style-warnings)
+  two-many-value-forms-error
+  (ensure-cases (form)
+      '((a b c)
+	((:values a b) 1 2 3))
+    (ensure-condition metabang-bind:bind-too-many-value-forms-error
+      (macroexpand `(bind (,form) (list a))))))
 
-
-
+(addtest (test-bind-style-warnings)
+  two-many-value-forms-warnings-with-flet
+  (ensure-no-warning
+    (macroexpand `(bind (((:flet x (a)) (setf a (* 2 a)) (list a))) (x 2)))))
