@@ -16,7 +16,7 @@
 		     (progn ,@(bind-macro-helper
                        remaining-bindings declarations body)))))
 	    (cl-ppcre:register-groups-bind 
-		,vars (,regex ,value-form :sharedp t)
+		,vars (,regex ,(first value-form) :sharedp t)
 	      ,(bind-filter-declarations
 		declarations variable-form)
 	      (setf ,gok t)
@@ -32,7 +32,7 @@
      body declarations remaining-bindings)
   ;; (:re "re" vars)
   (bind (((regex &rest vars) variable-form))
-    `((cl-ppcre:register-groups-bind ,vars (,regex ,value-form :sharedp t)
+    `((cl-ppcre:register-groups-bind ,vars (,regex ,(first value-form) :sharedp t)
        ,(bind-filter-declarations
 	 declarations variable-form)
        ,@(bind-macro-helper
@@ -54,7 +54,7 @@
 		     ,@(bind-macro-helper
 			remaining-bindings declarations body))))
 	    (cl-ppcre:register-groups-bind 
-		,vars (,regex ,value-form :sharedp t)
+		,vars (,regex ,(first value-form) :sharedp t)
 	      ,(bind-filter-declarations
 		declarations variable-form)
 	      (setf ,gok t)

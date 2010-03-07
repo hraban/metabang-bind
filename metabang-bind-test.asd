@@ -22,7 +22,9 @@
 				     (:file "classes")
 				     (:file "plists")
 				     (:file "arrays")
-				     (:file "functions"))))
+				     (:file "functions")
+				     #+allegro
+				     (:file "regex"))))
   :depends-on (:metabang-bind :lift))
 
 #+asdf-system-connections 
