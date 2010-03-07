@@ -15,7 +15,7 @@
 		   (return-from ,gblock
 		     (progn ,@(bind-macro-helper
                        remaining-bindings declarations body)))))
-	    (excl:re-let ,regex ,value-form
+	    (excl:re-let ,regex ,(first value-form)
 		,(loop for var in vars for i from 1 collect
 		      `(,var ,i))
 	      ,(bind-filter-declarations
