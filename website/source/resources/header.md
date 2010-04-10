@@ -2,7 +2,7 @@
 {set-property style-sheet "http://common-lisp.net/project/cl-containers/shared/style-200.css"}
 {set-property author "Gary Warren King"}
 
-{include resources/shared.md}
+{include shared.md}
 {include shared-links.md}
 
 <div id="header">

@@ -3,7 +3,7 @@
 {set-property author "Gary Warren King"}
 
 <div id="header">
-{include resources/navigation.md}
+{include navigation.md}
 </div>
 
-{include resources/shared.md}
+{include shared.md}

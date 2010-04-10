@@ -25,7 +25,6 @@ Bind is extensible. It handles the traditional multiple-values, destructuring, a
 
 Simple bindings are as in _let*_. Destructuring is done if the first item in a binding is a list. Multiple value binding is done if the first item in a binding is a list and the first item in the list is 'values'.
 
-
 ## Some examples
 
 Bind mimics let in its general syntax:
@@ -208,6 +207,19 @@ Tamas Papp had the idea of letting `bind` handle arrays too. For example,
     ==> (1 2 3)
 
 One quick method definition and a few unit-tests later and bind does!
+
+## More bindings
+
+Since bind is extensible and I'm fallible, there are probably things bind can do that haven't made it into this guide. Use the following commands to see what bind can do:
+
+{docs binding-forms}
+
+{docs binding-form-docstring}
+
+{docs binding-form-groups}
+
+{docs binding-form-synonyms}
+
 
 ## Extending bind yourself
 
