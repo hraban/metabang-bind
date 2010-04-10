@@ -76,10 +76,12 @@ the `:values` form to request multiple-values.")
                      (bad-variable c) (binding c)))))
 
 (defun binding-forms ()
+  "Return a list of the binding-forms that bind supports in alphabetical order."
   (let* ((forms (get 'bind :binding-forms)))
     (sort (loop for form in forms collect (car form)) 'string-lessp)))
 
 (defun binding-form-groups ()
+  "Return a list of the available binding-forms grouped into their synonyms."
   (let ((binding-forms (get 'bind :binding-forms))
 	(canonical-names
 	 (sort
@@ -90,6 +92,14 @@ the `:values` form to request multiple-values.")
 	 (cdr (assoc form binding-forms)))))
 
 (defun binding-form-synonyms (name)
+  "Return a list of synonyms for the binding-form `name`. 
+
+For example
+
+    > (binding-form-synonyms :accessors)
+    (:accessors :writable-accessors)
+
+"
   (let* ((forms (get 'bind :binding-forms))
 	 (datum (assoc name forms)))
     (and datum
