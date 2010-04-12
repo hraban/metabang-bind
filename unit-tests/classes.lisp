@@ -38,6 +38,14 @@
    '(:changed 2 3) :test 'equal))
 
 (addtest (test-classes)
+  slots-r/o-1
+  (ensure-same
+   (bind (((:slots-r/o a c)
+	   (make-instance 'metabang-bind-class-1 :a 1 :b 2 :c 3)))
+     (list a c))
+   '(1 3) :test 'equal))
+
+(addtest (test-classes)
   basic-accessors-r/o-1
   (ensure-same
    (bind (((:accessors-read-only a c e)

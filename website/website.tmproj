@@ -3,24 +3,24 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>source/index.md</string>
+	<string>source/user-guide.mmd</string>
 	<key>documents</key>
 	<array>
 		<dict>
+			<key>filename</key>
+			<string>source/images/index.mmd</string>
+			<key>lastUsed</key>
+			<date>2010-04-10T15:24:01Z</date>
+		</dict>
+		<dict>
+			<key>expanded</key>
+			<true/>
 			<key>name</key>
 			<string>images</string>
 			<key>regexFolderFilter</key>
 			<string>!.*/(\.[^/]*|CVS|_darcs|_MTN|\{arch\}|blib|.*~\.nib|.*\.(framework|app|pbproj|pbxproj|xcode(proj)?|bundle))$</string>
 			<key>sourceDirectory</key>
 			<string>source/images</string>
-		</dict>
-		<dict>
-			<key>filename</key>
-			<string>source/index.md</string>
-			<key>lastUsed</key>
-			<date>2009-05-29T12:50:08Z</date>
-			<key>selected</key>
-			<true/>
 		</dict>
 		<dict>
 			<key>expanded</key>
@@ -38,28 +38,66 @@
 		</dict>
 		<dict>
 			<key>filename</key>
-			<string>source/user-guide.md</string>
+			<string>source/user-guide.mmd</string>
 			<key>lastUsed</key>
-			<date>2008-03-18T01:39:35Z</date>
+			<date>2010-04-10T15:24:58Z</date>
+			<key>selected</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>../../shared/shared-links.md</string>
+			<key>lastUsed</key>
+			<date>2010-04-10T15:11:40Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
 	<integer>200</integer>
 	<key>metaData</key>
 	<dict>
-		<key>source/index.md</key>
+		<key>../../shared/shared-links.md</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>50</integer>
+				<integer>9</integer>
 				<key>line</key>
-				<integer>69</integer>
+				<integer>68</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>41</integer>
+			<integer>39</integer>
+		</dict>
+		<key>source/images/index.mmd</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>86</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>62</integer>
+			<key>firstVisibleLine</key>
+			<integer>50</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>86</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>86</integer>
+			</dict>
 		</dict>
 		<key>source/resources/footer.md</key>
 		<dict>
@@ -110,9 +148,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
 				<integer>9</integer>
+				<key>line</key>
+				<integer>8</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -124,30 +162,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>71</integer>
+				<integer>9</integer>
 				<key>line</key>
-				<integer>25</integer>
+				<integer>4</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>58</integer>
-				<key>line</key>
-				<integer>25</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>71</integer>
-				<key>line</key>
-				<integer>25</integer>
-			</dict>
 		</dict>
 		<key>source/resources/navigation.md</key>
 		<dict>
@@ -177,35 +199,36 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>source/user-guide.md</key>
+		<key>source/user-guide.mmd</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>10</integer>
+				<integer>28</integer>
 				<key>line</key>
-				<integer>200</integer>
+				<integer>216</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>174</integer>
+			<integer>195</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>source/user-guide.md</string>
 		<string>source/resources/guide-footer.md</string>
+		<string>source/images/index.mmd</string>
+		<string>source/user-guide.mmd</string>
 		<string>source/resources/header.md</string>
 		<string>source/resources/footer.md</string>
 		<string>source/resources/shared.md</string>
 		<string>source/resources/guide-header.md</string>
 		<string>source/resources/navigation.md</string>
-		<string>source/index.md</string>
+		<string>../../shared/shared-links.md</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{2, 90}, {578, 788}}</string>
+	<string>{{2, 0}, {578, 778}}</string>
 </dict>
 </plist>
