@@ -189,7 +189,7 @@ rather than the `(item . value)` pair.")
 
 ;;;;
 
-(defbinding-form ((:read-only-slots :slots-read-only)
+(defbinding-form ((:read-only-slots :slots-read-only :slots-r/o)
 		  :docstring 
 		  "The `:read-only-slots` binding form is short hand for the `with-slots` macro except that it provides only read access to the class.
 
