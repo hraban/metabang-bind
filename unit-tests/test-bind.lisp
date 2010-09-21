@@ -19,6 +19,24 @@
     (ensure-same (second vars) (first ignores))))
 
 (addtest (test-bind-fix-nils-destructured)
+  simple-list-with-_
+  (multiple-value-bind (vars ignores)
+                       (bind-fix-nils-destructured '(a _ c)) 
+    (ensure-same (first vars) 'a)
+    (ensure-same (third vars) 'c)
+    (ensure-same (second vars) (first ignores))))
+
+(addtest (test-bind-fix-nils-destructured)
+  simple-list-with-_-2
+  (multiple-value-bind (vars ignores)
+                       (bind-fix-nils-destructured '(a _ c _ _)) 
+    (ensure-same (first vars) 'a)
+    (ensure-same (third vars) 'c)
+    (ensure (member (second vars) ignores))
+    (ensure (member (fourth vars) ignores))
+    (ensure (member (fifth vars) ignores))))
+
+(addtest (test-bind-fix-nils-destructured)
   dotted-list
   (multiple-value-bind (vars ignores)
                        (bind-fix-nils-destructured '(a . b)) 
