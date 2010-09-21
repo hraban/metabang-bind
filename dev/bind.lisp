@@ -166,13 +166,21 @@ in a binding is a list and the first item in the list is ':values'."
 
 ;;;;
 
+(defun var-ignorable-p (var)
+  (or (null var) 
+      (and (symbolp var) (string= (symbol-name var) (symbol-name '_)))))
+
+(defun mint-ignorable-variable ()
+  (gensym (symbol-name '#:bind-ignore-)))
+
 (defun bind-fix-nils (var-list)
   (let (vars ignores)
     (loop for v in var-list do
-          (cond (v (push v vars))
-                (t (let ((ignore (gensym "BIND-IGNORE-")))
+          (cond ((var-ignorable-p v)
+		 (let ((ignore (mint-ignorable-variable)))
                      (push ignore vars)
-                     (push ignore ignores)))))
+                     (push ignore ignores)))
+		(t (push v vars))))
     (values (nreverse vars) ignores)))
 
 (defun bind-fix-nils-destructured (var-list)
@@ -190,10 +198,11 @@ in a binding is a list and the first item in the list is ':values'."
       
       (values (tree-map
                (lambda (x)
-                 (cond (x x)
-                       (t (let ((ignore (gensym "BIND-IGNORE-")))
-                            (push ignore ignores)
-                            ignore))))
+                 (cond ((var-ignorable-p x) 
+			(let ((ignore (mint-ignorable-variable)))
+			  (push ignore ignores)
+			  ignore))
+                       (t x)))
                var-list)
               ignores))))
 
