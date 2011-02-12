@@ -9,7 +9,7 @@
   (let ((array-size (array-total-size variables)))
     `(let* (,@(loop for i below array-size
 		 for var = (row-major-aref variables i)
-		 unless (eq var nil) collect
+		 unless (var-ignorable-p var) collect
 		 `(,var (row-major-aref ,values ,i)))))))
 
 (defbinding-form (symbol
@@ -21,7 +21,7 @@
 		   `(,variables))))))
 
 (defbinding-form (:flet
-		  :docstring "Local functions are defined using
+		     :docstring "Local functions are defined using
 
     \(:flet <name> \(<lambda list>\) <function definition>\)
 
@@ -32,10 +32,38 @@ When the function definition occurs in a progn. For example:
     ==> (90 90)
 
 "
-		  :use-values-p nil
-		  :accept-multiple-forms-p t)
+		     :use-values-p nil
+		     :accept-multiple-forms-p t)
   (destructuring-bind (name args) variables
-      `(flet ((,name ,args (progn ,@values))))))
+    (let* ((declaration (when (eq (caar values) 'declare)
+			  (first values)))
+	   (body        (if declaration (rest values) values)))
+      `(flet ((,name ,args
+		,@(when declaration `(,declaration))
+		(progn ,@body)))))))
+
+(defbinding-form (:labels
+		     :docstring "Local functions are defined using
+
+    \(:flet <name> \(<lambda list>\) <function definition>\)
+
+When the function definition occurs in a progn. For example:
+
+    \(bind \(\(\(:flet double-list \(x\)\) \(setf x \(* 2 x\)\) \(list x x\)\)\)
+        \(double-list 45\)\)
+    ==> (90 90)
+
+"
+		     :use-values-p nil
+		     :accept-multiple-forms-p t)
+  (destructuring-bind (name args) variables
+    (let* ((declaration (when (eq (caar values) 'declare)
+			  (first values)))
+	   (body        (if declaration (rest values) values)))
+      `(labels ((,name ,args
+		  ,@(when declaration `(,declaration))
+		  (progn ,@body)))))))
+
 
 (defbinding-form (cons
 		  :use-values-p nil)

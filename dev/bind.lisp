@@ -19,12 +19,6 @@ See the file COPYING for details
   '(dynamic-extent ignore optimize ftype inline 
     special ignorable notinline type))
 
-;; tvav: change this
-(defparameter *bind-treat-values-as-values* nil
-  "**Deprecated** - this variable no longer has any effect on
-the parsing of a binding form. `bind` now requires that you use
-the `:values` form to request multiple-values.")
-
 (defparameter *bind-non-var-declarations*
   '(optimize ftype inline notinline 
     #+allegro
