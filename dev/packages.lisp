@@ -22,9 +22,6 @@
      #:*bind-non-var-declarations*
      #:*bind-lambda-list-markers*
 
-     ;; this will be removed ... someday
-     #:*bind-treat-values-as-values*
-
      #:bind-error
      #:bind-keyword/optional-nil-with-default-error
      #:bind-missing-value-form-warning

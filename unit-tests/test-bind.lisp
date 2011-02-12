@@ -95,74 +95,6 @@
 
 ;;;;
 
-(deftestsuite test-treat-values-as-values (metabang-bind-test)
-  ())
-
-(deftestsuite test-treat-values-as-values-true (test-treat-values-as-values)
-  ()
-  (:documentation "treat-values-as-values is no longer supported.")
-  (:dynamic-variables 
-   (*bind-treat-values-as-values* t)))
-
-(addtest (test-treat-values-as-values-true
-	  :expected-failure t)
-  generate-warning
-  (ensure-warning 
-    (macroexpand '(bind (((values a b) (foo)))
-		   (list a b)))))
-
-(addtest (test-treat-values-as-values-true)
-  generate-no-warning-on-simple-binding
-  (ensure-no-warning 
-    (macroexpand '(bind ((values 42))
-		   (list values)))))
-
-(addtest (test-treat-values-as-values-true)
-  generate-no-warning-on-simple-binding-works
-  (ensure-same
-   (eval '(bind ((values 42))
-	   (list values)))
-   '(42)
-   :test 'equal))
-
-(addtest (test-treat-values-as-values-true)
-  generate-destructuring-if-atom
-  (ensure-same 
-   (eval '(let ((foo (list 0 1 2)))
-	   (bind (((values a b) foo))
-	     (list values a b))))
-   (list 0 1 2) :test 'equal))
-
-(addtest (test-treat-values-as-values-true
-	  :expected-error t)
-  generate-values-if-cons
-  (ensure-same 
-   (eval '(bind (((values a b) (values 1 2)))
-	     (list a b)))
-   (list 1 2) :test 'equal))
-
-(deftestsuite test-treat-values-as-values-false (test-treat-values-as-values)
-  ()
-  (:dynamic-variables 
-   (*bind-treat-values-as-values* nil)))
-
-(addtest (test-treat-values-as-values-false)
-  generate-no-warning
-  (handler-case
-      (macroexpand '(bind (((values a b) (foo)))
-		     (list a b)))
-    (warning (c) (declare (ignore c))
-	     (ensure nil))))
-
-(addtest (test-treat-values-as-values-false)
-  generate-destructuring-if-cons
-  (ensure-same 
-   (eval '(bind (((values a b) (list 0 1 2)))
-	     (list values a b)))
-   (list 0 1 2) :test 'equal))
-
-;;;;;;;
-
 (deftestsuite test-bind-style-warnings (metabang-bind-test)
   ())
 
@@ -198,3 +130,34 @@
   two-many-value-forms-warnings-with-flet
   (ensure-no-warning
     (macroexpand `(bind (((:flet x (a)) (setf a (* 2 a)) (list a))) (x 2)))))
+
+;;;;
+
+(deftestsuite test-ignore-underscores (metabang-bind-test)
+  ()
+  (:equality-test (lambda (a b)
+		    (equalp (remove-gensyms a) (remove-gensyms b)))))
+
+(addtest (test-ignore-underscores)
+  test-simple-destructuring
+  (ensure-same
+   (macroexpand '(bind (((nil a b) (foo)))
+		  (list a b)))
+   (macroexpand '(bind (((_ a b) (foo)))
+		  (list a b)))))
+
+(addtest (test-ignore-underscores)
+  test-multiple-values
+  (ensure-same
+   (macroexpand '(bind (((:values a nil b) (foo)))
+		  (list a b)))
+   (macroexpand '(bind (((:values a _ b) (foo)))
+		  (list a b)))))
+
+(addtest (test-ignore-underscores)
+  test-array
+  (ensure-same
+   (macroexpand '(bind ((#(a nil b) (foo)))
+		  (list a b)))
+   (macroexpand '(bind ((#(a _ b) (foo)))
+		  (list a b)))))
