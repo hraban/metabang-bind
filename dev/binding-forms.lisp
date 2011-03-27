@@ -35,10 +35,16 @@ When the function definition occurs in a progn. For example:
 		     :use-values-p nil
 		     :accept-multiple-forms-p t)
   (destructuring-bind (name args) variables
-    (let* ((declaration (when (eq (caar values) 'declare)
-			  (first values)))
-	   (body        (if declaration (rest values) values)))
+    (let* (declaration body docstring)
+      (when (typep (first values) 'string)
+	(setf docstring (first values)
+	      values (rest values)))
+      (when (eq (caar values) 'declare)
+	(setf declaration (first values)
+	      values (rest values)))
+      (setf body values)
       `(flet ((,name ,args
+		,@(when docstring `(,docstring))
 		,@(when declaration `(,declaration))
 		(progn ,@body)))))))
 
@@ -57,10 +63,16 @@ When the function definition occurs in a progn. For example:
 		     :use-values-p nil
 		     :accept-multiple-forms-p t)
   (destructuring-bind (name args) variables
-    (let* ((declaration (when (eq (caar values) 'declare)
-			  (first values)))
-	   (body        (if declaration (rest values) values)))
+    (let* (declaration body docstring)
+      (when (typep (first values) 'string)
+	(setf docstring (first values)
+	      values (rest values)))
+      (when (eq (caar values) 'declare)
+	(setf declaration (first values)
+	      values (rest values)))
+      (setf body values)
       `(labels ((,name ,args
+		  ,@(when docstring `(,docstring))
 		  ,@(when declaration `(,declaration))
 		  (progn ,@body)))))))
 
