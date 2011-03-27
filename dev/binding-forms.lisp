@@ -97,7 +97,7 @@ The functions are automatically declared dynamic-extent
       `(flet ((,name ,args
 		,@(when docstring `(,docstring))
 		,@(when declaration `(,declaration))
-		(progn ,@body))) 
+		(progn ,@body)))
 	 (declare (dynamic-extent (function ,name)))))))
 
 

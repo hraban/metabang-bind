@@ -6,7 +6,7 @@
 (addtest (test-flet)
   basic-access
   (bind (((:flet doit (x))
-	  (setf x (* 2 x)) 
+	  (setf x (* 2 x))
 	  (setf x (+ x 3))
 	  x))
     (ensure-same (doit 1) 5)
@@ -16,7 +16,7 @@
   declarations
   (bind (((:flet doit (x))
 	  (declare (type fixnum x))
-	  (setf x (* 2 x)) 
+	  (setf x (* 2 x))
 	  (setf x (+ x 3))
 	  x))
     (ensure-same (doit 1) 5)
@@ -26,7 +26,7 @@
   docstring
   (bind (((:flet doit (x))
 	  "if I knew how to get the docstring out of flet, I'd test it."
-	  (setf x (* 2 x)) 
+	  (setf x (* 2 x))
 	  (setf x (+ x 3))
 	  x))
     (ensure-same (doit 1) 5)
@@ -37,7 +37,7 @@
   (bind (((:flet doit (x))
 	  "whatever"
 	  (declare (type fixnum x))
-	  (setf x (* 2 x)) 
+	  (setf x (* 2 x))
 	  (setf x (+ x 3))
 	  x))
     (ensure-same (doit 1) 5)
@@ -68,7 +68,7 @@
   declarations
   (bind (((:labels doit (x))
 	  (declare (type fixnum x))
-	  (setf x (* 2 x)) 
+	  (setf x (* 2 x))
 	  (setf x (+ x 3))
 	  x))
     (ensure-same (doit 1) 5)
@@ -78,7 +78,7 @@
   docstring
   (bind (((:labels doit (x))
 	  "if I knew how to get the docstring out of flet, I'd test it."
-	  (setf x (* 2 x)) 
+	  (setf x (* 2 x))
 	  (setf x (+ x 3))
 	  x))
     (ensure-same (doit 1) 5)
@@ -89,7 +89,7 @@
   (bind (((:labels doit (x))
 	  "whatever"
 	  (declare (type fixnum x))
-	  (setf x (* 2 x)) 
+	  (setf x (* 2 x))
 	  (setf x (+ x 3))
 	  x))
     (ensure-same (doit 1) 5)
