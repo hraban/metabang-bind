@@ -43,6 +43,12 @@
     (ensure-same (doit 1) 5)
     (ensure-same (doit 2) 7)))
 
+(addtest (test-flet)
+  docstring-and-declarations
+  (bind (((:flet constant (x))
+	  (declare (ignore x))
+	  42))
+    (ensure-same (constant 1) 42)))
 
 
 (deftestsuite test-labels (metabang-bind-test)
@@ -88,3 +94,10 @@
 	  x))
     (ensure-same (doit 1) 5)
     (ensure-same (doit 2) 7)))
+
+(addtest (test-labels)
+  docstring-and-declarations
+  (bind (((:labels constant (x))
+	  (declare (ignore x))
+	  42))
+    (ensure-same (constant 1) 42)))

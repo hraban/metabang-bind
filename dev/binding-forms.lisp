@@ -39,7 +39,7 @@ When the function definition occurs in a progn. For example:
       (when (typep (first values) 'string)
 	(setf docstring (first values)
 	      values (rest values)))
-      (when (eq (caar values) 'declare)
+      (when (and (listp (first values)) (eq (caar values) 'declare))
 	(setf declaration (first values)
 	      values (rest values)))
       (setf body values)
@@ -47,6 +47,7 @@ When the function definition occurs in a progn. For example:
 		,@(when docstring `(,docstring))
 		,@(when declaration `(,declaration))
 		(progn ,@body)))))))
+
 
 (defbinding-form (:labels
 		     :docstring "Local functions are defined using
@@ -67,7 +68,7 @@ When the function definition occurs in a progn. For example:
       (when (typep (first values) 'string)
 	(setf docstring (first values)
 	      values (rest values)))
-      (when (eq (caar values) 'declare)
+      (when (and (listp (first values)) (eq (caar values) 'declare))
 	(setf declaration (first values)
 	      values (rest values)))
       (setf body values)
