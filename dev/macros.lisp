@@ -132,3 +132,23 @@ instead
 (defun next-value (x)
   (gensym x))
 
+(defmacro lambda-bind ((&rest instrs) &rest body)
+  "Use `bind' to allow restructuring of argument to lambda expressions.
+
+This lets you funcall and destructure simultaneously. For example
+
+    (let ((fn (lambda-bind ((a b) c) (cons a c))))
+      (funcall fn '(1 2) 3))
+    ;; => (1 . 3)
+
+Via eschulte (see git://gist.github.com/902174.git).
+"
+  #-allegro
+  (declare (indent 1))
+  (let* ((evald-instrs instrs)
+         (syms (mapcar (lambda (_)
+			 (declare (ignore _))
+			 (gensym))
+		       evald-instrs)))
+    `(lambda ,syms (bind ,(mapcar #'list evald-instrs syms) ,@body))))
+
