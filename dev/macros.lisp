@@ -69,10 +69,10 @@ form.)
   (let* ((multiple-names? (consp name/s))
 	 (main-method-name nil)
 	 (force-keyword? (or multiple-names?
-			     (eq (symbol-package name/s) 
+			     (eq (symbol-package name/s)
 				 (load-time-value (find-package :keyword)))))
 	 #+(or)
-	 (gignores (gensym "ignores")))    
+	 (gignores (gensym "ignores")))
     (cond (multiple-names?
 	   (setf main-method-name (gentemp (symbol-name '#:binding-generator)))
 	   )
@@ -83,14 +83,14 @@ form.)
 	     (intern (symbol-name name)
 		     (load-time-value (find-package :keyword)))))
       (when force-keyword?
-	(setf name/s (if multiple-names? 
+	(setf name/s (if multiple-names?
 			 (mapcar #'form-keyword name/s)
 			 (form-keyword name/s))))
       `(progn
 	 (setf (binding-form-docstring ',name/s) ,docstring)
-	 ,@(loop for name in (if multiple-names? name/s (list name/s)) 
+	 ,@(loop for name in (if multiple-names? name/s (list name/s))
 	       when (keywordp name) collect
-		`(defmethod binding-form-accepts-multiple-forms-p 
+		`(defmethod binding-form-accepts-multiple-forms-p
 		      ((binding-form (eql ,name)))
 		    ,accept-multiple-forms-p))
 	 (,(if multiple-names? 'defun 'defmethod) ,main-method-name
@@ -102,7 +102,7 @@ form.)
 	   ,(if use-values-p
 		;; surely this could be simpler!
 		`(let ((gvalues (next-value "values-")))
-		   `((let ((,gvalues ,,(if accept-multiple-forms-p 
+		   `((let ((,gvalues ,,(if accept-multiple-forms-p
 					   `value-form
 					   `(first value-form))))
 		       (declare (ignorable ,gvalues))
@@ -111,9 +111,9 @@ form.)
 			       `(funcall (lambda (variables values) ,@body)
 					 variable-form gvalues))
 					;		 ,@(when ,gignores `((declare (ignore ,@gignores))))
-			   ,@(bind-filter-declarations 
+			   ,@(bind-filter-declarations
 			      declarations variable-form)
-			   ,@(bind-macro-helper 
+			   ,@(bind-macro-helper
 			      remaining-bindings declarations body)))))
 		``((,@,(if (symbolp (first body))
 			   `(,(first body) variable-form ,(if accept-multiple-forms-p
@@ -124,28 +124,28 @@ form.)
 							`value-form
 							`(first value-form))))
 		       ,@(bind-filter-declarations declarations variable-form)
-		       ,@(bind-macro-helper 
+		       ,@(bind-macro-helper
 			  remaining-bindings declarations body)))))
 	 ,@(when multiple-names?
 		 (loop for name in name/s collect
-		      `(defmethod bind-generate-bindings 
+		      `(defmethod bind-generate-bindings
 			   ((kind (eql ,name))
-			    variable-form value-form body declarations 
+			    variable-form value-form body declarations
 			    remaining-bindings)
-			 (,main-method-name 
-			  variable-form value-form body declarations 
+			 (,main-method-name
+			  variable-form value-form body declarations
 			  remaining-bindings))))
 	 #+(or)
 	 ,@(when multiple-names?
 		 (loop for name in name/s collect
-		      `(defmethod bind-generate-bindings 
+		      `(defmethod bind-generate-bindings
 			   ((kind (eql ,name))
-			    variable-form value-form body declarations 
+			    variable-form value-form body declarations
 			    remaining-bindings)
-			 (,main-method-name 
+			 (,main-method-name
 			  variable-form
 			  ,(if accept-multiple-forms-p `value-form `(first value-form))
-			  body declarations 
+			  body declarations
 			  remaining-bindings))))
 	 ))))
 
@@ -163,7 +163,7 @@ This lets you funcall and destructure simultaneously. For example
 
 Via eschulte (see git://gist.github.com/902174.git).
 "
-  #+(or)
+  #-allegro
   (declare (indent 1))
   (let* ((evald-instrs instrs)
          (syms (mapcar (lambda (_)
