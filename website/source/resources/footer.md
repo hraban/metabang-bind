@@ -6,7 +6,7 @@
     <a class="nav" href="http://common-lisp.net/" title="Common-Lisp.net"><img src="http://common-lisp.net/project/cl-containers/shared/buttons/lisp-lizard.png" width="80" height="15" title="Common-Lisp.net" alt="Common-Lisp.net button" /></a>
 
 <span class="copyright">
-  Copyright (c) 2005 - 2009 Gary Warren King (gwking@metabang.com) 
+  Copyright (c) 2005 - {current-year} Gary Warren King (gwking@metabang.com) 
 </span>
 
 metabang-bind has an [MIT style][mit-license] license

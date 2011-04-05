@@ -3,15 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>source/resources/guide-header.md</string>
+	<string>source/resources/footer.md</string>
 	<key>documents</key>
 	<array>
-		<dict>
-			<key>filename</key>
-			<string>source/images/index.mmd</string>
-			<key>lastUsed</key>
-			<date>2011-02-12T16:06:04Z</date>
-		</dict>
 		<dict>
 			<key>expanded</key>
 			<true/>
@@ -42,13 +36,19 @@
 			<key>filename</key>
 			<string>source/user-guide.mmd</string>
 			<key>lastUsed</key>
-			<date>2011-02-12T16:07:12Z</date>
+			<date>2011-04-05T16:58:22Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>../../shared/shared-links.md</string>
 			<key>lastUsed</key>
 			<date>2010-04-10T15:11:40Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>source/index.mmd</string>
+			<key>lastUsed</key>
+			<date>2011-04-05T16:59:24Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
@@ -69,14 +69,14 @@
 			<key>firstVisibleLine</key>
 			<integer>39</integer>
 		</dict>
-		<key>source/images/index.mmd</key>
+		<key>source/index.mmd</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>10</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>7</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -88,9 +88,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>37</integer>
 				<key>line</key>
-				<integer>6</integer>
+				<integer>8</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -236,35 +236,19 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>3</integer>
+				<integer>307</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>2</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>3</integer>
-			</dict>
+			<integer>276</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
 		<string>source/resources/guide-footer.md</string>
-		<string>source/images/index.mmd</string>
 		<string>source/user-guide.mmd</string>
+		<string>source/index.mmd</string>
 		<string>source/resources/header.md</string>
 		<string>source/user-guide.css</string>
 		<string>source/resources/footer.md</string>
@@ -276,6 +260,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{2, 32}, {578, 746}}</string>
+	<string>{{76, 32}, {578, 746}}</string>
 </dict>
 </plist>
