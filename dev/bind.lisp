@@ -70,7 +70,7 @@ See the file COPYING for details
                      (bad-variable c) (binding c)))))
 
 (defun binding-forms ()
-  "Return a list of the binding-forms that bind supports in alphabetical order."
+  "Return a list of all binding-forms that bind supports in alphabetical order."
   (let* ((forms (get 'bind :binding-forms)))
     (sort (loop for form in forms collect (car form)) 'string-lessp)))
 
