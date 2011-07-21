@@ -2,7 +2,26 @@
 
 (defgeneric bind-generate-bindings (kind variable-form value-form
 					 body declarations remaining-bindings)
-  )
+  (:documentation "Handle the expansion for a particular binding-form.
+
+`kind` specifies the binding form. It can be a type (e.g., symbol or array)
+or a keyword (e.g., :flet or :plist). `variable-form` and `value-form` are 
+taken from the binding-form given to `bind`. E.g., if you have a bind like
+
+    (bind (((:values a b c) (foo))
+           (x 2)) 
+       (declare (optimize (speed 3)) (type simple-array a))
+       ...)
+
+then `kind` will be :values, `variable-form` will be the list `(a b c)` and
+`value-form` will be the expression `(foo)`. `bind-generate-bindings` 
+uses these variables as data to construct the generated code. `body` contains
+the rest of the code passed to `bind` (the `...`) above in this case) and can
+usually be ignored. `declarations` contains all of the declarations from the 
+`bind` form (e.g. the `optimize (speed 3)` and so on) and should be used to 
+insert whatever declarations match at this particular point in the expansion.
+Use [bind-filter-declarations][] to do this easily). Finally, remaining-bindings
+contains the rest of the binding-forms. It can also be safely ignored."))
 
 (defbinding-form (array
 		  :use-values-p t)

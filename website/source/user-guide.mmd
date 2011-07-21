@@ -21,9 +21,20 @@ Bind combines _let_, _destructuring-bind_ and _multiple-value-bind_ and a whole 
 2. make it easier to understand all of the different forms
 of destructuring and variable binding by unifying the multiple forms of syntax and reducing special cases.
 
-Bind is extensible. It handles the traditional multiple-values, destructuring, and let-forms as well as property-lists, classes, and structures. Even better, you can create new your own binding forms to make your code cleaner and easier to follow (for others _and_ yourself!).
+Bind is extensible. It handles the traditional multiple-values, destructuring, and let-forms as well as property-lists, classes, and structures. Even better, you can create your own binding forms to make your code cleaner and easier to follow (for others _and_ yourself!).
 
 Simple bindings are as in _let*_. Destructuring is done if the first item in a binding is a list. Multiple value binding is done if the first item in a binding is a list and the first item in the list is the keyword ':values'.
+
+{remark
+### Summary
+
+<table>
+<tr>
+<td>symbol</td><td>`x` or `(x 45)`</td><td>`let`</td>
+<td>array</td><td>`(#(a b) #(4 5))`</td><td>`let`</td>
+</tr>
+</table>
+}
 
 ## Some examples
 
@@ -312,11 +323,14 @@ Eric Schulte contributed `lambda-bind` (note, he called it
 Bind's syntax is extensible: the work for each
 binding-specification is handled by a generic function. This
 means that you can evolve bind to fit your program for
-whatever sort of data-structure makes sense for you.
+whatever sort of data-structure makes sense for you. To make
+a binding form, you can either define a method for `bind-generate-bindings`
+or you can use the `defbinding-form` macro.
 
-Details on this mechanism are coming soon, sidereal speaking.
- (if you're
-impatient, you can look at the source code for the methods of
-`bind-generate-bindings`).
+{docs bind-generate-bindings}
+
+{docs defbinding-form}
+
+There are many more examples included in the source code.
 
 {include resources/guide-footer.md}

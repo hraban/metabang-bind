@@ -17,6 +17,7 @@ instead
   (binding-form-docstring what))
 
 (defun binding-form-docstring (name)
+  "Returns the docstring for a binding form named `name`."
   (let* ((docstrings (get 'bind :docstrings))
 	 (forms (get 'bind :binding-forms))
 	 (canonical-name (first (assoc name forms)))
@@ -46,6 +47,24 @@ instead
 (defmacro defbinding-form ((name/s &key docstring remove-nils-p
 				   description (use-values-p t)
 				   (accept-multiple-forms-p nil)) &body body)
+  "Describe how `bind` should expand particular binding-forms.
+
+`defbinding-form` links a name or type with an expansion. These
+definitions are used by `bind` at macro-expansion time to generate
+the code that actually does the bindings for you.  For example:
+
+    (defbinding-form (symbol :use-values-p nil)
+      (if (keywordp kind)
+          (error \"Don't have a binding form for ~s\" kind)
+          `(let (,@(if values
+                     `((,variables ,values))
+                     `(,variables))))))
+
+This binding form tells to expand clauses whose first element is
+a symbol using `let`. (It also gets `bind` to signal an error if
+the first element is a keyword that doesn't have a defined binding
+form.)
+"
   (declare (ignorable remove-nils-p description))
   (let* ((multiple-names? (consp name/s))
 	 (main-method-name nil)
