@@ -6,11 +6,13 @@
 
 (defbinding-form (array
 		  :use-values-p t)
-  (let ((array-size (array-total-size variables)))
+  (let* ((dimensions (array-dimensions variables))
+	 (array-size (array-total-size variables))
+	 (accessor (if (cdr dimensions) 'row-major-aref 'aref)))
     `(let* (,@(loop for i below array-size
 		 for var = (row-major-aref variables i)
 		 unless (var-ignorable-p var) collect
-		 `(,var (row-major-aref ,values ,i)))))))
+		 `(,var (,accessor ,values ,i)))))))
 
 (defbinding-form (symbol
 		  :use-values-p nil)
