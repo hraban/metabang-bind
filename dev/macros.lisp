@@ -74,11 +74,11 @@ instead
 		`(defmethod binding-form-accepts-multiple-forms-p 
 		      ((binding-form (eql ,name)))
 		    ,accept-multiple-forms-p))
-	 (defmethod ,main-method-name 
-	     (,@(unless multiple-names?
-			(if force-keyword?
-			    `((kind (eql ,name/s)))
-			    `((kind ,name/s))))
+	 (,(if multiple-names? 'defun 'defmethod) ,main-method-name
+           (,@(unless multiple-names?
+                      (if force-keyword?
+                          `((kind (eql ,name/s)))
+                          `((kind ,name/s))))
 	      variable-form value-form body declarations remaining-bindings)
 	   ,(if use-values-p
 		;; surely this could be simpler!
