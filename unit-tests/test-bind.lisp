@@ -161,3 +161,15 @@
 		  (list a b)))
    (macroexpand '(bind ((#(a _ b) (foo)))
 		  (list a b)))))
+
+;;;
+
+(deftestsuite test-for-unused-declarations (metabang-bind-test)
+  ())
+
+(addtest (test-for-unused-declarations)
+  test-1
+  (ensure-condition bind-unused-declarations-error
+    (eval '(bind:bind ((a 2) (b 3))
+	    (declare (type fixnum a b c) (optimize (speed 3)))
+	    a b))))

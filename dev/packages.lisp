@@ -26,6 +26,7 @@
      #:bind-keyword/optional-nil-with-default-error
      #:bind-missing-value-form-warning
      #:bind-too-many-value-forms-error
+     #:bind-unused-declarations-error
 
      #:lambda-bind))
 
