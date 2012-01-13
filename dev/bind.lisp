@@ -69,6 +69,13 @@ See the file COPYING for details
              (format s "Bad binding '~S' in '~A'; cannot use a default value for &key or &optional arguments."
                      (bad-variable c) (binding c)))))
 
+(define-condition bind-unused-declarations-error (error)
+  ((unused-declarations :initform (error "must supply unused-declarations")
+			:initarg :unused-declarations
+			:reader unused-declarations))
+  (:report (lambda (c s)
+	     (format s "Unused declarations in bind: ~{~s~^, ~}" (unused-declarations c)))))
+
 (defun binding-forms ()
   "Return a list of all binding-forms that bind supports in alphabetical order."
   (let* ((forms (get 'bind :binding-forms)))
@@ -99,6 +106,8 @@ For example
     (and datum
 	 (rest datum))))
 
+(defvar *all-declarations*)
+
 (defmacro bind ((&rest bindings) &body body)
   "Bind is a replacement for let*, destructuring-bind and multiple-value-bind. An example is probably the best way to describe its syntax:
 
@@ -115,12 +124,17 @@ in a binding is a list and the first item in the list is ':values'."
           (push (first body) declarations)
           (setf body (rest body)))
     (if bindings
-        (first (bind-macro-helper
-                bindings
-                (bind-expand-declarations (nreverse declarations)) body))
+	(let ((*all-declarations* (bind-expand-declarations (nreverse declarations))))
+	  (prog1
+	      (first (bind-macro-helper bindings *all-declarations* body))
+	    (check-for-unused-variable-declarations *all-declarations*)))
         `(locally
              ,@declarations
            ,@body))))
+
+(defun check-for-unused-variable-declarations (declarations)
+  (when declarations
+    (error 'bind-unused-declarations-error :unused-declarations declarations)))
 
 (defun bind-macro-helper (bindings declarations body)
   (if bindings
@@ -260,7 +274,9 @@ in a binding is a list and the first item in the list is ':values'."
 			      var-names))
 			;; type
                         (member (third declaration) var-names)) collect
-               declaration))) 
+	      (progn
+		(setf *all-declarations* (remove declaration *all-declarations*))
+		declaration))))
     (when declaration 
       `((declare ,@declaration)))))
 
