@@ -9,11 +9,11 @@
   simple-list
   (ensure-same (bind-fix-nils-destructured '(a b c)) (values '(a b c) nil)
 	       :test #'equal))
-  
+
 (addtest (test-bind-fix-nils-destructured)
   simple-list-with-nil
   (multiple-value-bind (vars ignores)
-                       (bind-fix-nils-destructured '(a nil c)) 
+                       (bind-fix-nils-destructured '(a nil c))
     (ensure-same (first vars) 'a)
     (ensure-same (third vars) 'c)
     (ensure-same (second vars) (first ignores))))
@@ -21,7 +21,7 @@
 (addtest (test-bind-fix-nils-destructured)
   simple-list-with-_
   (multiple-value-bind (vars ignores)
-                       (bind-fix-nils-destructured '(a _ c)) 
+                       (bind-fix-nils-destructured '(a _ c))
     (ensure-same (first vars) 'a)
     (ensure-same (third vars) 'c)
     (ensure-same (second vars) (first ignores))))
@@ -29,7 +29,7 @@
 (addtest (test-bind-fix-nils-destructured)
   simple-list-with-_-2
   (multiple-value-bind (vars ignores)
-                       (bind-fix-nils-destructured '(a _ c _ _)) 
+                       (bind-fix-nils-destructured '(a _ c _ _))
     (ensure-same (first vars) 'a)
     (ensure-same (third vars) 'c)
     (ensure (member (second vars) ignores))
@@ -39,7 +39,7 @@
 (addtest (test-bind-fix-nils-destructured)
   dotted-list
   (multiple-value-bind (vars ignores)
-                       (bind-fix-nils-destructured '(a . b)) 
+                       (bind-fix-nils-destructured '(a . b))
     (ensure-same (car vars) 'a)
     (ensure-same (cdr vars) 'b)
     (ensure-same ignores nil)))
@@ -47,7 +47,7 @@
 (addtest (test-bind-fix-nils-destructured)
   dotted-list-with-nil-1
   (multiple-value-bind (vars ignores)
-                       (bind-fix-nils-destructured '(nil . b)) 
+                       (bind-fix-nils-destructured '(nil . b))
     (ensure-same (car vars) (first ignores))
     (ensure-same (cdr vars) 'b)
     (ensure-same (length ignores) 1)))
@@ -55,7 +55,7 @@
 (addtest (test-bind-fix-nils-destructured)
   keyword-list
   (multiple-value-bind (vars ignores)
-                       (bind-fix-nils-destructured '(a b &key (c 1) d (e x y))) 
+                       (bind-fix-nils-destructured '(a b &key (c 1) d (e x y)))
     (ensure-same (length vars) 6)
     (ensure-same (length ignores) 0)
     (ensure-same vars '(a b &key (c 1) d (e x y)) :test #'equal)))
@@ -63,7 +63,7 @@
 (addtest (test-bind-fix-nils-destructured)
   keyword-list-with-nil-non-keyword
   (multiple-value-bind (vars ignores)
-                       (bind-fix-nils-destructured '(nil b &key (c 1) d (e x y))) 
+                       (bind-fix-nils-destructured '(nil b &key (c 1) d (e x y)))
     (ensure-same (length ignores) 1)
     (ensure-same (rest vars) '(b &key (c 1) d (e x y)) :test #'equal)
     (ensure-same (first vars) (first ignores))))
@@ -71,7 +71,7 @@
 (addtest (test-bind-fix-nils-destructured)
   keyword-list-with-nil-keyword
   (multiple-value-bind (vars ignores)
-                       (bind-fix-nils-destructured '(a b &key (c 1) nil (e x y))) 
+                       (bind-fix-nils-destructured '(a b &key (c 1) nil (e x y)))
     (ensure-same (length ignores) 1)
     (ensure-same (subseq vars 0 3) '(a b &key) :test #'equal)
     (ensure-same (fifth vars) (first ignores))
@@ -88,7 +88,7 @@
   keyword-list-with-allow-other-keys
   (multiple-value-bind (vars ignores)
                        (bind-fix-nils-destructured '(a b &key (c 1) d (e x y)
-                                                     &allow-other-keys)) 
+                                                     &allow-other-keys))
     (ensure-same (length ignores) 0)
     (ensure-same vars '(a b &key (c 1) d (e x y)
                         &allow-other-keys) :test #'equal)))
@@ -197,7 +197,7 @@
   (let ((bind:*unused-declarations-behavior* :warn))
     (ensure-condition bind::bind-unused-declarations-warning
       (eval '(bind:bind (((:values _ b ) (values 1 2)))
-	      (declare (type fixnum b) (ignorable b) 
+	      (declare (type fixnum b) (ignorable b)
 	       (simple-vector d) (optimize (speed 3)))
 	      b)))))
 
@@ -206,7 +206,7 @@
   (let ((bind:*unused-declarations-behavior* nil))
     (ensure-no-warning
       (eval '(bind:bind (((:values _ b ) (values 1 2)))
-	      (declare (type fixnum b) (ignorable b) 
+	      (declare (type fixnum b) (ignorable b)
 	       (simple-vector d) (optimize (speed 3)))
 	      b)))))
 
