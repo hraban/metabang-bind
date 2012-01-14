@@ -161,19 +161,34 @@ where each `structure-spec` is an atom or list with two elements:
 
 * a list has the variable name as its first item and the structure
   field name as its second.
+
+The expansion uses symbol-macrolet to convert variables references to 
+structure references. Declarations are handled using `the`.
 ")
   (let ((conc-name (first variables))
 	(vars (rest variables)))
     (assert conc-name)
     (assert vars)
-    `(symbol-macrolet ,(loop for var in vars collect
-			    (let ((var-var (or (and (consp var) (first var))
-					       var))
-				  (var-conc (or (and (consp var) (second var))
-						var)))
-			      `(,var-var (,(intern 
-					    (format nil "~a~a" conc-name var-conc)) 
-					   ,values)))))))
+    `(symbol-macrolet 
+	 ,(loop for var in vars collect
+	       (let* ((var-var (or (and (consp var) (first var))
+				  var))
+		     (var-conc (or (and (consp var) (second var))
+				   var))
+		     (var-name (intern (format nil "~a~a" conc-name var-conc)))
+		     (type-declaration (find-type-declaration var-var declarations)))
+		 `(,var-var ,(if type-declaration
+				 `(the ,type-declaration (,var-name ,values))
+				 `(,var-name ,values))))))))
+
+(defun find-type-declaration (var declarations)
+  ;; declarations looks like ((declare (type fixnum a) (optimize ...) ...) 
+  (let ((result (find-if (lambda (declaration)
+			   (and (eq (first declaration) 'type)
+				(member var (cddr declaration))))
+			 (rest (first declarations)))))
+    (when result 
+      (second result))))
 
 #|
 (defbinding-form (:function

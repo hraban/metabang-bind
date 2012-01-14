@@ -209,3 +209,26 @@
 	      (declare (type fixnum b) (ignorable b) 
 	       (simple-vector d) (optimize (speed 3)))
 	      b)))))
+
+;;;
+
+#|
+
+(defun x (a b)
+  (declare (fixnum a b))
+  (+ a b))
+
+(defun x (c)
+  (bind (((:structure/rw c- a b) c))
+    (declare (fixnum a b))
+    (declare (optimize (speed 3) (safety 0)))
+    (+ a b)))
+
+(disassemble 'x)
+
+(bind (((:structure/rw foo- a b c) (bar)))
+  (declare (type fixnum a) (double b))
+  (declare (optimize (speed 3)))
+  )
+
+|#
