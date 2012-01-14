@@ -14,16 +14,25 @@
 
 ## Introduction
 
-Bind combines _let_, _destructuring-bind_ and _multiple-value-bind_ and a whole lot more into a single form. It has two goals: 
+`bind` combines _let_, _destructuring-bind_, _multiple-value-bind_
+*and** a whole lot more into a single form. It has two goals:
 
 1. reduce the number of nesting levels
 
-2. make it easier to understand all of the different forms
-of destructuring and variable binding by unifying the multiple forms of syntax and reducing special cases.
+2. make it easier to understand all of the different forms of
+destructuring and variable binding by unifying the multiple forms of
+syntax and reducing special cases.
 
-Bind is extensible. It handles the traditional multiple-values, destructuring, and let-forms as well as property-lists, classes, and structures. Even better, you can create your own binding forms to make your code cleaner and easier to follow (for others _and_ yourself!).
+`bind` is extensible. It handles the traditional multiple-values,
+destructuring, and let-forms as well as property-lists, classes, and
+structures. Even better, you can create your own binding forms to make
+your code cleaner and easier to follow (for others _and_ yourself!).
 
-Simple bindings are as in _let*_. Destructuring is done if the first item in a binding is a list. Multiple value binding is done if the first item in a binding is a list and the first item in the list is the keyword ':values'.
+Simple bindings are as in _let*_. Destructuring is done if the first
+item in a binding is a list. Multiple value binding is done if the
+first item in a binding is a list and the first item in the list is
+the keyword ':values'.
+
 
 {remark
 ### Summary
@@ -48,7 +57,6 @@ where each `binding` can either be an symbol or a list. If the binding is an ato
            (...)) 
       ...)
 
-  
 ### Bind as a replacement for let
 
 You can use `bind` as a direct replacement for `let*`:
@@ -294,6 +302,39 @@ rather than
         ...)
 
 Generally speaking, this shouldn't make much of a difference.
+
+## `bind` and declarations
+
+`bind` handles declarations transparently by splitting them
+up and moving them to the correct place in the expansion. For 
+example
+
+    (bind (((:values a b) (foo x))
+           (#(d e) (bar y)))
+      (declare (type fixnum a d)
+    	   (optimize (speed 3)))
+      (list a b d e))
+
+becomes
+  
+    (multiple-value-bind (a b)
+        (foo x)
+      (declare (type fixnum a) (optimize (speed 3)))
+      (let ((#:values-258889 (bar y)))
+        (let* ((d (row-major-aref #:values-258889 0))
+               (e (row-major-aref #:values-258889 1)))
+          (declare (optimize (speed 3)))
+          (list a b d e))))
+
+because `bind` knows to keep the variable declarations 
+(like `type`) with their variables and to repeat 
+other declarations (like `optimize`) at each level. 
+
+`bind` keeps track of variables declarations that are not used.
+The configuration variable `*unused-declarations-behavior*` controls
+what `bind` does:
+
+{docs *unused-declarations-behavior*}
 
 ## More bindings
 

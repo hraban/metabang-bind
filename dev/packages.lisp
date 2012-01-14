@@ -26,6 +26,10 @@
      #:bind-keyword/optional-nil-with-default-error
      #:bind-missing-value-form-warning
      #:bind-too-many-value-forms-error
+
+     #:*unused-declarations-behavior*
+     #:bind-unused-declarations-condition
+     #:bind-unused-declarations-warning
      #:bind-unused-declarations-error
 
      #:lambda-bind))

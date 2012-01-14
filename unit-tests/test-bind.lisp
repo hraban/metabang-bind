@@ -168,8 +168,44 @@
   ())
 
 (addtest (test-for-unused-declarations)
-  test-1
-  (ensure-condition bind-unused-declarations-error
-    (eval '(bind:bind ((a 2) (b 3))
-	    (declare (type fixnum a b c) (optimize (speed 3)))
-	    a b))))
+  test-error-1
+  (let ((bind:*unused-declarations-behavior* :error))
+    (ensure-condition bind::bind-unused-declarations-error
+      (eval '(bind:bind ((a 2) (b 3))
+	      (declare (type fixnum a b c) (optimize (speed 3)))
+	      a b)))))
+
+(addtest (test-for-unused-declarations)
+  test-error-2
+  (let ((bind:*unused-declarations-behavior* :error))
+    (ensure-condition bind:bind-unused-declarations-error
+      (eval '(bind:bind (((:values _ b ) (values 1 2)))
+	      (declare (type fixnum b) (ignorable b)
+	       (simple-vector d) (optimize (speed 3)))
+	      b)))))
+
+(addtest (test-for-unused-declarations)
+  test-warning-1
+  (let ((bind:*unused-declarations-behavior* :warn))
+    (ensure-condition bind::bind-unused-declarations-warning
+      (eval '(bind:bind ((a 2) (b 3))
+	      (declare (type fixnum a b c) (optimize (speed 3)))
+	      a b)))))
+
+(addtest (test-for-unused-declarations)
+  test-warning-2
+  (let ((bind:*unused-declarations-behavior* :warn))
+    (ensure-condition bind::bind-unused-declarations-warning
+      (eval '(bind:bind (((:values _ b ) (values 1 2)))
+	      (declare (type fixnum b) (ignorable b) 
+	       (simple-vector d) (optimize (speed 3)))
+	      b)))))
+
+(addtest (test-for-unused-declarations)
+  test-no-warning-1
+  (let ((bind:*unused-declarations-behavior* nil))
+    (ensure-no-warning
+      (eval '(bind:bind (((:values _ b ) (values 1 2)))
+	      (declare (type fixnum b) (ignorable b) 
+	       (simple-vector d) (optimize (speed 3)))
+	      b)))))

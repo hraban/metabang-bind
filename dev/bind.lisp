@@ -15,6 +15,19 @@ See the file COPYING for details
 (defmethod binding-form-accepts-multiple-forms-p ((binding-form t))
   nil)
 
+(defparameter *unused-declarations-behavior*
+  :print-warning
+  "Tells bind how to behave when it encounters an unused declaration.
+
+The possible options are
+
+* :print-warning (the current default) - print a warning about the problem 
+   and signal a `bind-unused-declarations-condition`
+
+* :warn - signal a `bind-unused-declarations-warning` warning
+
+* :error - signal a `bind-unused-declarations-error` error")
+
 (defparameter *bind-all-declarations*
   '(dynamic-extent ignore optimize ftype inline 
     special ignorable notinline type))
@@ -69,12 +82,20 @@ See the file COPYING for details
              (format s "Bad binding '~S' in '~A'; cannot use a default value for &key or &optional arguments."
                      (bad-variable c) (binding c)))))
 
-(define-condition bind-unused-declarations-error (error)
+(define-condition bind-unused-declarations-condition ()
   ((unused-declarations :initform (error "must supply unused-declarations")
 			:initarg :unused-declarations
 			:reader unused-declarations))
   (:report (lambda (c s)
 	     (format s "Unused declarations in bind: ~{~s~^, ~}" (unused-declarations c)))))
+
+(define-condition bind-unused-declarations-warning (bind-unused-declarations-condition
+						   simple-style-warning)
+  ())
+
+(define-condition bind-unused-declarations-error (bind-unused-declarations-condition
+						  error)
+  ())
 
 (defun binding-forms ()
   "Return a list of all binding-forms that bind supports in alphabetical order."
@@ -109,7 +130,9 @@ For example
 (defvar *all-declarations*)
 
 (defmacro bind ((&rest bindings) &body body)
-  "Bind is a replacement for let*, destructuring-bind and multiple-value-bind. An example is probably the best way to describe its syntax:
+  "Bind is a replacement for let*, destructuring-bind, multiple-value-bind and more. 
+
+An example is probably the best way to describe its syntax:
 
     \(bind \(\(a 2\)
            \(\(b &rest args &key \(c 2\) &allow-other-keys\) '\(:a :c 5 :d 10 :e 54\)\)
@@ -134,7 +157,15 @@ in a binding is a list and the first item in the list is ':values'."
 
 (defun check-for-unused-variable-declarations (declarations)
   (when declarations
-    (error 'bind-unused-declarations-error :unused-declarations declarations)))
+    (case *unused-declarations-behavior* 
+      (:warn
+       (warn 'bind-unused-declarations-warning :unused-declarations declarations))
+      (:error
+       (error 'bind-unused-declarations-error :unused-declarations declarations))
+      (t
+       (format *error-output* "~&;;; warning: wnused declarations found in form: ~{~s~^, ~}."
+	       declarations)
+       (signal 'bind-unused-declarations-condition :unused-declarations declarations)))))
 
 (defun bind-macro-helper (bindings declarations body)
   (if bindings
