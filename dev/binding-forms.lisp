@@ -183,10 +183,14 @@ structure references. Declarations are handled using `the`.
 
 (defun find-type-declaration (var declarations)
   ;; declarations looks like ((declare (type fixnum a) (optimize ...) ...) 
-  (let ((result (find-if (lambda (declaration)
-			   (and (eq (first declaration) 'type)
-				(member var (cddr declaration))))
-			 (rest (first declarations)))))
+  ;;   or ((type fixnum a) ...?)
+  (let* ((declarations (if (eq (first (first declarations)) 'declare)
+			   (rest (first declarations))
+			   declarations))
+	 (result (find-if (lambda (declaration)
+			    (and (eq (first declaration) 'type)
+				 (member var (cddr declaration))))
+			  declarations)))
     (when result 
       (second result))))
 
