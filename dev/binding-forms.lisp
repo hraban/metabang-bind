@@ -5,20 +5,20 @@
   (:documentation "Handle the expansion for a particular binding-form.
 
 `kind` specifies the binding form. It can be a type (e.g., symbol or array)
-or a keyword (e.g., :flet or :plist). `variable-form` and `value-form` are 
+or a keyword (e.g., :flet or :plist). `variable-form` and `value-form` are
 taken from the binding-form given to `bind`. E.g., if you have a bind like
 
     (bind (((:values a b c) (foo))
-           (x 2)) 
+           (x 2))
        (declare (optimize (speed 3)) (type simple-array a))
        ...)
 
 then `kind` will be :values, `variable-form` will be the list `(a b c)` and
-`value-form` will be the expression `(foo)`. `bind-generate-bindings` 
+`value-form` will be the expression `(foo)`. `bind-generate-bindings`
 uses these variables as data to construct the generated code. `body` contains
 the rest of the code passed to `bind` (the `...`) above in this case) and can
-usually be ignored. `declarations` contains all of the declarations from the 
-`bind` form (e.g. the `optimize (speed 3)` and so on) and should be used to 
+usually be ignored. `declarations` contains all of the declarations from the
+`bind` form (e.g. the `optimize (speed 3)` and so on) and should be used to
 insert whatever declarations match at this particular point in the expansion.
 Use [bind-filter-declarations][] to do this easily). Finally, remaining-bindings
 contains the rest of the binding-forms. It can also be safely ignored."))
@@ -107,7 +107,7 @@ When the function definition occurs in a progn. For example:
 	,@(when ignores `((declare (ignore ,@ignores)))))))
 
 (defbinding-form (:values
-		  :docstring "" 
+		  :docstring ""
 		  :use-values-p nil)
   (multiple-value-bind (vars ignores)
       (bind-fix-nils variables)
@@ -140,9 +140,9 @@ where each `structure-spec` is an atom or list with two elements:
 				    var))
 		       (var-conc (or (and (consp var) (second var))
 				     var)))
-		   `(,var-var (,(intern 
-				 (format nil "~a~a" 
-					 conc-name var-conc)) 
+		   `(,var-var (,(intern
+				 (format nil "~a~a"
+					 conc-name var-conc))
 				,values)))))))
 
 (defbinding-form ((:structure/rw)
@@ -162,14 +162,14 @@ where each `structure-spec` is an atom or list with two elements:
 * a list has the variable name as its first item and the structure
   field name as its second.
 
-The expansion uses symbol-macrolet to convert variables references to 
+The expansion uses symbol-macrolet to convert variables references to
 structure references. Declarations are handled using `the`.
 ")
   (let ((conc-name (first variables))
 	(vars (rest variables)))
     (assert conc-name)
     (assert vars)
-    `(symbol-macrolet 
+    `(symbol-macrolet
 	 ,(loop for var in vars collect
 	       (let* ((var-var (or (and (consp var) (first var))
 				  var))
@@ -182,7 +182,7 @@ structure references. Declarations are handled using `the`.
 				 `(,var-name ,values))))))))
 
 (defun find-type-declaration (var declarations)
-  ;; declarations looks like ((declare (type fixnum a) (optimize ...) ...) 
+  ;; declarations looks like ((declare (type fixnum a) (optimize ...) ...)
   ;;   or ((type fixnum a) ...?)
   (let* ((declarations (if (eq (first (first declarations)) 'declare)
 			   (rest (first declarations))
@@ -191,7 +191,7 @@ structure references. Declarations are handled using `the`.
 			    (and (eq (first declaration) 'type)
 				 (member var (cddr declaration))))
 			  declarations)))
-    (when result 
+    (when result
       (second result))))
 
 #|
@@ -210,7 +210,7 @@ structure references. Declarations are handled using `the`.
 	      (t (+ (fib (- x 1)) (fib (- x 2)))))))
   (fib 5))
 
-1 1 2 3 5 
+1 1 2 3 5
 
 ;;; fails, need to combine like forms...
 (bind (((:function ep (x))
@@ -235,7 +235,7 @@ structure references. Declarations are handled using `the`.
 "The binding form for association-list is as follows:
 
     (:alist assoc-spec*)
-    
+
 where each assoc-spec is an atom or a list of up to three elements:
 
 * atoms bind a variable with that name to an item with the same name.
@@ -261,17 +261,17 @@ rather than the `(item . value)` pair.")
 		   (3 (setf var-key (second spec)
 			    var-default (third spec)))
 		   (t
-		    (error "bad properly list variable specification: ~s" 
+		    (error "bad properly list variable specification: ~s"
 			   spec)))
 		 (when (string= (symbol-name var-key) "_")
 		   (setf var-key var-name))
-		 `(,var-name (or (cdr (assoc ',var-key ,values)) 
+		 `(,var-name (or (cdr (assoc ',var-key ,values))
 				 ,@(when var-default `(,var-default))))))))
 
 ;;;;
 
 (defbinding-form ((:read-only-slots :slots-read-only :slots-r/o)
-		  :docstring 
+		  :docstring
 		  "The `:read-only-slots` binding form is short hand for the `with-slots` macro except that it provides only read access to the class.
 
 The syntax is (:read-only-slots slot-spec*)
@@ -284,9 +284,9 @@ Where `slot-spec` can be an atom or a list with two elements.
 * If the specification is a list, then bind will use the first item for
   the variable's name and the second item for the slot-name.
 
-See [slots][slots-binding-spec] for a 
+See [slots][slots-binding-spec] for a
 variant that provides only read-write access to the class."
-)		  
+)
   `(let* (,@(loop for var in variables collect
 		 (let ((var-var (or (and (consp var) (first var))
 				    var))
@@ -295,7 +295,7 @@ variant that provides only read-write access to the class."
 		   `(,var-var (slot-value ,values ',var-slot)))))))
 
 (defbinding-form (:slots
-		  :docstring 
+		  :docstring
 		  "The `:slots` binding form is short hand for the `with-slots` macro.
 
 The syntax is (:slots slot-spec*)
@@ -308,10 +308,10 @@ Where `slot-spec` can be an atom or a list with two elements.
 * If the specification is a list, then bind will use the first item for
   the variable's name and the second item for the slot-name.
 
-See [read-only-slots][read-only-slots-binding-spec] for a 
+See [read-only-slots][read-only-slots-binding-spec] for a
 variant that provides only read-write access to the class."
-)		  
-  `(with-slots 
+)
+  `(with-slots
 	 (,@(loop for var in variables collect
 		 (let ((var-var (or (and (consp var) (first var))
 				    var))
@@ -322,7 +322,7 @@ variant that provides only read-write access to the class."
 
 ;;;;
 
-(defbinding-form ((:read-only-accessors 
+(defbinding-form ((:read-only-accessors
 		   :accessors-read-only
 		   :accessors-r/o)
 		  :docstring "The `:read-only-accessors` binding form is short hand for `with-accessors` macro that provides only read access to the class.
@@ -337,7 +337,7 @@ Where `accessor-spec` can be an atom or a list with two elements.
 * If the specification is a list, then bind will use the first item for
   the variable's name and the second item for the accessor name.
 
-See [accessors][accessors-binding-spec] for a 
+See [accessors][accessors-binding-spec] for a
 variant that provides only read-write access to the class."
 )
   `(let* ,(loop for var in variables collect
@@ -360,10 +360,10 @@ Where `accessor-spec` can be an atom or a list with two elements.
 * If the specification is a list, then bind will use the first item for
   the variable's name and the second item for the accessor name.
 
-See [read-only-accessors][read-only-accessors-binding-spec] for a 
+See [read-only-accessors][read-only-accessors-binding-spec] for a
 variant that provides only read-only access to the class."
 )
-  `(with-accessors 
+  `(with-accessors
 	 (,@(loop for var in variables collect
 		 (let ((var-var (or (and (consp var) (first var))
 				    var))
@@ -373,24 +373,24 @@ variant that provides only read-only access to the class."
        ,values))
 
 (defbinding-form ((:plist :property-list :properties)
-		  :docstring 
+		  :docstring
 		  "The binding form for property-lists is as follows:
 
     (:plist property-spec*)
-    
+
 where each property-spec is an atom or a list of up to three elements:
 
 * atoms bind a variable with that name to
-a property with the same name (converting the name to a keyword in order to do the lookup). 
+a property with the same name (converting the name to a keyword in order to do the lookup).
 
 * lists with a single element are treated like atoms.
 
 * lists with two elements
 specify the variable in the first and the name of the
-property in the second. 
+property in the second.
 
 * Lists with three elements use
-the third element to specify a default value (if the 
+the third element to specify a default value (if the
 second element is #\_, then the property name is taken
 to be the same as the variable name).
 
@@ -433,15 +433,15 @@ keywords as keys. For example:
 		   (3 (setf var-key (second spec)
 			    var-default (third spec)))
 		   (t
-		    (error "bad properly list variable specification: ~s" 
+		    (error "bad properly list variable specification: ~s"
 			   spec)))
 		 (when (string= (symbol-name var-key) "_")
 		   (setf var-key var-name))
 		 (when form-keywords?
 		   (setf var-key (intern (symbol-name var-key) :keyword)))
 		 `(,var-name (getf ,values
-				   ,(if form-keywords? 
-					var-key `',var-key)  
+				   ,(if form-keywords?
+					var-key `',var-key)
 				   ,@(when var-default
 					   `(,var-default))))))))
 
