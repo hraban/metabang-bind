@@ -6,8 +6,8 @@ See the file COPYING for details
 
 |#
 
-(in-package #:metabang.bind) 
-    
+(in-package #:metabang.bind)
+
 (defgeneric binding-form-accepts-multiple-forms-p (binding-form)
   (:documentation "Returns true if a binding form can accept multiple forms
 (e.g., :flet)"))
@@ -21,7 +21,7 @@ See the file COPYING for details
 
 The possible options are
 
-* :print-warning (the current default) - print a warning about the problem 
+* :print-warning (the current default) - print a warning about the problem
    and signal a `bind-unused-declarations-condition`
 
 * :warn - signal a `bind-unused-declarations-warning` warning
@@ -29,11 +29,11 @@ The possible options are
 * :error - signal a `bind-unused-declarations-error` error")
 
 (defparameter *bind-all-declarations*
-  '(dynamic-extent ignore optimize ftype inline 
+  '(dynamic-extent ignore optimize ftype inline
     special ignorable notinline type))
 
 (defparameter *bind-non-var-declarations*
-  '(optimize ftype inline notinline 
+  '(optimize ftype inline notinline
     #+allegro
     :explain))
 
@@ -41,7 +41,7 @@ The possible options are
   (remove 'type
           (set-difference *bind-all-declarations* *bind-non-var-declarations*)))
 
-(defparameter *bind-lambda-list-markers* 
+(defparameter *bind-lambda-list-markers*
   '(&key &body &rest &args &optional))
 
 (define-condition simple-style-warning (style-warning simple-warning)
@@ -74,7 +74,7 @@ The possible options are
 		    :reader binding)))
 
 (define-condition bind-keyword/optional-nil-with-default-error (bind-error)
-                  ((bad-variable 
+                  ((bad-variable
 		    :initform nil
 		    :initarg :bad-variable
 		    :reader bad-variable))
@@ -107,14 +107,14 @@ The possible options are
   (let ((binding-forms (get 'bind :binding-forms))
 	(canonical-names
 	 (sort
-	  (delete-duplicates 
+	  (delete-duplicates
 	   (mapcar #'second (get 'bind :binding-forms)))
 	  #'string-lessp)))
     (loop for form in canonical-names collect
 	 (cdr (assoc form binding-forms)))))
 
 (defun binding-form-synonyms (name)
-  "Return a list of synonyms for the binding-form `name`. 
+  "Return a list of synonyms for the binding-form `name`.
 
 For example
 
@@ -130,7 +130,7 @@ For example
 (defvar *all-declarations*)
 
 (defmacro bind ((&rest bindings) &body body)
-  "Bind is a replacement for let*, destructuring-bind, multiple-value-bind and more. 
+  "Bind is a replacement for let*, destructuring-bind, multiple-value-bind and more.
 
 An example is probably the best way to describe its syntax:
 
@@ -157,7 +157,7 @@ in a binding is a list and the first item in the list is ':values'."
 
 (defun check-for-unused-variable-declarations (declarations)
   (when declarations
-    (case *unused-declarations-behavior* 
+    (case *unused-declarations-behavior*
       (:warn
        (warn 'bind-unused-declarations-warning :unused-declarations declarations))
       (:error
@@ -185,15 +185,15 @@ in a binding is a list and the first item in the list is ':values'."
 				     (eq (symbol-package (first variable-form))
 					 (load-time-value (find-package :keyword)))
 				     (first variable-form))))
-	(when (and (consp value-form) 
+	(when (and (consp value-form)
 		   (cdr value-form)
 		   (or (null binding-form)
 		       (not (binding-form-accepts-multiple-forms-p binding-form))))
-	  (error 'bind-too-many-value-forms-error 
+	  (error 'bind-too-many-value-forms-error
 		:variable-form variable-form :value-form value-form))
 	;;(print (list :vf variable-form :value value-form :a atomp :b binding-form))
 	(if binding-form
-	    (bind-generate-bindings 
+	    (bind-generate-bindings
 	     (first variable-form)
 	     (rest variable-form)
 	     value-form body declarations remaining-bindings)
@@ -206,7 +206,7 @@ in a binding is a list and the first item in the list is ':values'."
 ;;;;
 
 (defun var-ignorable-p (var)
-  (or (null var) 
+  (or (null var)
       (and (symbolp var) (string= (symbol-name var) (symbol-name '_)))))
 
 (defun mint-ignorable-variable ()
@@ -224,7 +224,7 @@ in a binding is a list and the first item in the list is ':values'."
 
 (defun bind-fix-nils-destructured (var-list)
   (let ((ignores nil))
-    (labels (;; adapted from metatilities 
+    (labels (;; adapted from metatilities
              (tree-map (fn tree)
                "Maps FN over every atom in TREE."
                (cond
@@ -234,10 +234,10 @@ in a binding is a list and the first item in the list is ':values'."
                  (cons
                   (tree-map fn (car tree))
                   (when (cdr tree) (tree-map fn (cdr tree))))))))
-      
+
       (values (tree-map
                (lambda (x)
-                 (cond ((var-ignorable-p x) 
+                 (cond ((var-ignorable-p x)
 			(let ((ignore (mint-ignorable-variable)))
 			  (push ignore ignores)
 			  ignore))
@@ -254,12 +254,12 @@ in a binding is a list and the first item in the list is ':values'."
 (defun bind-get-vars-from-lambda-list (lambda-list)
   (let ((result nil))
     (labels ((do-it (thing)
-	       (cond ((atom thing) 
+	       (cond ((atom thing)
 		      (unless (or (member thing *bind-lambda-list-markers*)
 				  (null thing))
 			(push thing result)))
 		     ((dotted-pair-p thing)
-		      (do-it (car thing)) 
+		      (do-it (car thing))
 		      (do-it (cdr thing)))
 		     (t
 		      (do-it (car thing))
@@ -268,7 +268,7 @@ in a binding is a list and the first item in the list is ':values'."
     (nreverse result)))
 
 #+(or)
-(loop for item in lambda-list 
+(loop for item in lambda-list
    unless (member item *bind-lambda-list-markers*) collect
      (if (consp item) (first item) item))
 
@@ -288,16 +288,16 @@ in a binding is a list and the first item in the list is ':values'."
                            `(type ,(first decl) ,var)))))))
 
 (defun bind-filter-declarations (declarations var-names)
-  (setf var-names (if (consp var-names) var-names (list var-names)))  
+  (setf var-names (if (consp var-names) var-names (list var-names)))
   (setf var-names (bind-get-vars-from-lambda-list var-names))
   ;; each declaration is separate
   (let ((declaration
-         (loop for declaration in declarations 
+         (loop for declaration in declarations
                when (or (member (first declaration)
 				*bind-non-var-declarations*)
                         (and (member (first declaration)
 				     *bind-simple-var-declarations*)
-			     (member 
+			     (member
 			      (if (atom (second declaration))
 				  (second declaration)
 				  ;; ... (function foo) ...)
@@ -308,13 +308,13 @@ in a binding is a list and the first item in the list is ':values'."
 	      (progn
 		(setf *all-declarations* (remove declaration *all-declarations*))
 		declaration))))
-    (when declaration 
+    (when declaration
       `((declare ,@declaration)))))
 
 ;;; fluid-bind
 
 (defmacro fluid-bind ((&rest bindings) &body body)
-  "Fluid-bind is an extension of bind that handles setting and resetting places. For example, suppose that an object of class foo has a slot named bar whose value is currently 3. The following code would evaluate the inner body with bar bound to 17 and restore it when the inner body is exited. 
+  "Fluid-bind is an extension of bind that handles setting and resetting places. For example, suppose that an object of class foo has a slot named bar whose value is currently 3. The following code would evaluate the inner body with bar bound to 17 and restore it when the inner body is exited.
 
 \(fluid-bind \(\(\(bar foo\) 17\)\)
   \(print \(bar foo\)\)\)
@@ -327,7 +327,7 @@ This is similar to dynamic-binding but _much_ less robust."
         (cleanup-forms nil)
         (gensyms nil))
     (loop for binding in bindings collect
-          (destructuring-bind 
+          (destructuring-bind
 		(setup-form cleanup-form)
 	      (cond ((consp binding)
 		     (destructuring-bind (var value) binding
@@ -396,8 +396,8 @@ This is similar to dynamic-binding but _much_ less robust."
         (bind ((a 3))
           (list *last-world* *foo* a)))
       (setf *foo #:2)))
-  (set *last-world* #:g1))      
-    
+  (set *last-world* #:g1))
+
 (fluid-bind (a b)
   (+ a a))
 |#

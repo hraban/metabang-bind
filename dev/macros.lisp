@@ -105,6 +105,7 @@ form.)
 		   `((let ((,gvalues ,,(if accept-multiple-forms-p 
 					   `value-form
 					   `(first value-form))))
+		       (declare (ignorable ,gvalues))
 		       (,@,(if (symbolp (first body))
 			       `(,(first body) variable-form gvalues)
 			       `(funcall (lambda (variables values) ,@body)

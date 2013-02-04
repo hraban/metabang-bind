@@ -3,12 +3,12 @@
 (defpackage #:metabang.bind
     (:use #:common-lisp)
     (:nicknames #:bind #:metabang-bind)
-    (:intern 
+    (:intern
      #:bind-generate-bindings
      #:bind-filter-declarations
      #:bind-macro-helper
      #:bind-fix-nils)
-    (:export 
+    (:export
      #:bind
      #:fluid-bind
 
@@ -41,7 +41,7 @@
 		  #:bind-filter-declarations
 		  #:bind-macro-helper
 		  #:bind-fix-nils)
-    (:export 
+    (:export
      #:bind-generate-bindings
      #:bind-filter-declarations
      #:bind-macro-helper
