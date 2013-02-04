@@ -17,6 +17,7 @@ instead
   (binding-form-docstring what))
 
 (defun binding-form-docstring (name)
+  "Returns the docstring for a binding form named `name`."
   (let* ((docstrings (get 'bind :docstrings))
 	 (forms (get 'bind :binding-forms))
 	 (canonical-name (first (assoc name forms)))
@@ -46,6 +47,24 @@ instead
 (defmacro defbinding-form ((name/s &key docstring remove-nils-p
 				   description (use-values-p t)
 				   (accept-multiple-forms-p nil)) &body body)
+  "Describe how `bind` should expand particular binding-forms.
+
+`defbinding-form` links a name or type with an expansion. These
+definitions are used by `bind` at macro-expansion time to generate
+the code that actually does the bindings for you.  For example:
+
+    (defbinding-form (symbol :use-values-p nil)
+      (if (keywordp kind)
+          (error \"Don't have a binding form for ~s\" kind)
+          `(let (,@(if values
+                     `((,variables ,values))
+                     `(,variables))))))
+
+This binding form tells to expand clauses whose first element is
+a symbol using `let`. (It also gets `bind` to signal an error if
+the first element is a keyword that doesn't have a defined binding
+form.)
+"
   (declare (ignorable remove-nils-p description))
   (let* ((multiple-names? (consp name/s))
 	 (main-method-name nil)
@@ -74,11 +93,11 @@ instead
 		`(defmethod binding-form-accepts-multiple-forms-p 
 		      ((binding-form (eql ,name)))
 		    ,accept-multiple-forms-p))
-	 (defmethod ,main-method-name 
-	     (,@(unless multiple-names?
-			(if force-keyword?
-			    `((kind (eql ,name/s)))
-			    `((kind ,name/s))))
+	 (,(if multiple-names? 'defun 'defmethod) ,main-method-name
+           (,@(unless multiple-names?
+                      (if force-keyword?
+                          `((kind (eql ,name/s)))
+                          `((kind ,name/s))))
 	      variable-form value-form body declarations remaining-bindings)
 	   ,(if use-values-p
 		;; surely this could be simpler!
@@ -86,6 +105,7 @@ instead
 		   `((let ((,gvalues ,,(if accept-multiple-forms-p 
 					   `value-form
 					   `(first value-form))))
+		       (declare (ignorable ,gvalues))
 		       (,@,(if (symbolp (first body))
 			       `(,(first body) variable-form gvalues)
 			       `(funcall (lambda (variables values) ,@body)
@@ -131,4 +151,24 @@ instead
 
 (defun next-value (x)
   (gensym x))
+
+(defmacro lambda-bind ((&rest instrs) &rest body)
+  "Use `bind' to allow restructuring of argument to lambda expressions.
+
+This lets you funcall and destructure simultaneously. For example
+
+    (let ((fn (lambda-bind ((a b) c) (cons a c))))
+      (funcall fn '(1 2) 3))
+    ;; => (1 . 3)
+
+Via eschulte (see git://gist.github.com/902174.git).
+"
+  #+(or)
+  (declare (indent 1))
+  (let* ((evald-instrs instrs)
+         (syms (mapcar (lambda (_)
+			 (declare (ignore _))
+			 (gensym))
+		       evald-instrs)))
+    `(lambda ,syms (bind ,(mapcar #'list evald-instrs syms) ,@body))))
 

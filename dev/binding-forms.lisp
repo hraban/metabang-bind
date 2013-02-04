@@ -2,7 +2,26 @@
 
 (defgeneric bind-generate-bindings (kind variable-form value-form
 					 body declarations remaining-bindings)
-  )
+  (:documentation "Handle the expansion for a particular binding-form.
+
+`kind` specifies the binding form. It can be a type (e.g., symbol or array)
+or a keyword (e.g., :flet or :plist). `variable-form` and `value-form` are 
+taken from the binding-form given to `bind`. E.g., if you have a bind like
+
+    (bind (((:values a b c) (foo))
+           (x 2)) 
+       (declare (optimize (speed 3)) (type simple-array a))
+       ...)
+
+then `kind` will be :values, `variable-form` will be the list `(a b c)` and
+`value-form` will be the expression `(foo)`. `bind-generate-bindings` 
+uses these variables as data to construct the generated code. `body` contains
+the rest of the code passed to `bind` (the `...`) above in this case) and can
+usually be ignored. `declarations` contains all of the declarations from the 
+`bind` form (e.g. the `optimize (speed 3)` and so on) and should be used to 
+insert whatever declarations match at this particular point in the expansion.
+Use [bind-filter-declarations][] to do this easily). Finally, remaining-bindings
+contains the rest of the binding-forms. It can also be safely ignored."))
 
 (defbinding-form (array
 		  :use-values-p t)
@@ -37,12 +56,19 @@ When the function definition occurs in a progn. For example:
 		     :use-values-p nil
 		     :accept-multiple-forms-p t)
   (destructuring-bind (name args) variables
-    (let* ((declaration (when (eq (caar values) 'declare)
-			  (first values)))
-	   (body        (if declaration (rest values) values)))
+    (let* (declaration body docstring)
+      (when (typep (first values) 'string)
+	(setf docstring (first values)
+	      values (rest values)))
+      (when (and (listp (first values)) (eq (caar values) 'declare))
+	(setf declaration (first values)
+	      values (rest values)))
+      (setf body values)
       `(flet ((,name ,args
+		,@(when docstring `(,docstring))
 		,@(when declaration `(,declaration))
 		(progn ,@body)))))))
+
 
 (defbinding-form (:labels
 		     :docstring "Local functions are defined using
@@ -59,10 +85,16 @@ When the function definition occurs in a progn. For example:
 		     :use-values-p nil
 		     :accept-multiple-forms-p t)
   (destructuring-bind (name args) variables
-    (let* ((declaration (when (eq (caar values) 'declare)
-			  (first values)))
-	   (body        (if declaration (rest values) values)))
+    (let* (declaration body docstring)
+      (when (typep (first values) 'string)
+	(setf docstring (first values)
+	      values (rest values)))
+      (when (and (listp (first values)) (eq (caar values) 'declare))
+	(setf declaration (first values)
+	      values (rest values)))
+      (setf body values)
       `(labels ((,name ,args
+		  ,@(when docstring `(,docstring))
 		  ,@(when declaration `(,declaration))
 		  (progn ,@body)))))))
 
@@ -129,19 +161,38 @@ where each `structure-spec` is an atom or list with two elements:
 
 * a list has the variable name as its first item and the structure
   field name as its second.
+
+The expansion uses symbol-macrolet to convert variables references to 
+structure references. Declarations are handled using `the`.
 ")
   (let ((conc-name (first variables))
 	(vars (rest variables)))
     (assert conc-name)
     (assert vars)
-    `(symbol-macrolet ,(loop for var in vars collect
-			    (let ((var-var (or (and (consp var) (first var))
-					       var))
-				  (var-conc (or (and (consp var) (second var))
-						var)))
-			      `(,var-var (,(intern 
-					    (format nil "~a~a" conc-name var-conc)) 
-					   ,values)))))))
+    `(symbol-macrolet 
+	 ,(loop for var in vars collect
+	       (let* ((var-var (or (and (consp var) (first var))
+				  var))
+		     (var-conc (or (and (consp var) (second var))
+				   var))
+		     (var-name (intern (format nil "~a~a" conc-name var-conc)))
+		     (type-declaration (find-type-declaration var-var declarations)))
+		 `(,var-var ,(if type-declaration
+				 `(the ,type-declaration (,var-name ,values))
+				 `(,var-name ,values))))))))
+
+(defun find-type-declaration (var declarations)
+  ;; declarations looks like ((declare (type fixnum a) (optimize ...) ...) 
+  ;;   or ((type fixnum a) ...?)
+  (let* ((declarations (if (eq (first (first declarations)) 'declare)
+			   (rest (first declarations))
+			   declarations))
+	 (result (find-if (lambda (declaration)
+			    (and (eq (first declaration) 'type)
+				 (member var (cddr declaration))))
+			  declarations)))
+    (when result 
+      (second result))))
 
 #|
 (defbinding-form (:function

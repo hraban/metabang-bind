@@ -14,16 +14,36 @@
 
 ## Introduction
 
-Bind combines _let_, _destructuring-bind_ and _multiple-value-bind_ and a whole lot more into a single form. It has two goals: 
+`bind` combines _let_, _destructuring-bind_, _multiple-value-bind_
+*and** a whole lot more into a single form. It has two goals:
 
 1. reduce the number of nesting levels
 
-2. make it easier to understand all of the different forms
-of destructuring and variable binding by unifying the multiple forms of syntax and reducing special cases.
+2. make it easier to understand all of the different forms of
+destructuring and variable binding by unifying the multiple forms of
+syntax and reducing special cases.
 
-Bind is extensible. It handles the traditional multiple-values, destructuring, and let-forms as well as property-lists, classes, and structures. Even better, you can create new your own binding forms to make your code cleaner and easier to follow (for others _and_ yourself!).
+`bind` is extensible. It handles the traditional multiple-values,
+destructuring, and let-forms as well as property-lists, classes, and
+structures. Even better, you can create your own binding forms to make
+your code cleaner and easier to follow (for others _and_ yourself!).
 
-Simple bindings are as in _let*_. Destructuring is done if the first item in a binding is a list. Multiple value binding is done if the first item in a binding is a list and the first item in the list is the keyword ':values'.
+Simple bindings are as in _let*_. Destructuring is done if the first
+item in a binding is a list. Multiple value binding is done if the
+first item in a binding is a list and the first item in the list is
+the keyword ':values'.
+
+
+{remark
+### Summary
+
+<table>
+<tr>
+<td>symbol</td><td>`x` or `(x 45)`</td><td>`let`</td>
+<td>array</td><td>`(#(a b) #(4 5))`</td><td>`let`</td>
+</tr>
+</table>
+}
 
 ## Some examples
 
@@ -37,7 +57,6 @@ where each `binding` can either be an symbol or a list. If the binding is an ato
            (...)) 
       ...)
 
-  
 ### Bind as a replacement for let
 
 You can use `bind` as a direct replacement for `let*`:
@@ -284,6 +303,39 @@ rather than
 
 Generally speaking, this shouldn't make much of a difference.
 
+## `bind` and declarations
+
+`bind` handles declarations transparently by splitting them
+up and moving them to the correct place in the expansion. For 
+example
+
+    (bind (((:values a b) (foo x))
+           (#(d e) (bar y)))
+      (declare (type fixnum a d)
+    	   (optimize (speed 3)))
+      (list a b d e))
+
+becomes
+  
+    (multiple-value-bind (a b)
+        (foo x)
+      (declare (type fixnum a) (optimize (speed 3)))
+      (let ((#:values-258889 (bar y)))
+        (let* ((d (row-major-aref #:values-258889 0))
+               (e (row-major-aref #:values-258889 1)))
+          (declare (optimize (speed 3)))
+          (list a b d e))))
+
+because `bind` knows to keep the variable declarations 
+(like `type`) with their variables and to repeat 
+other declarations (like `optimize`) at each level. 
+
+`bind` keeps track of variables declarations that are not used.
+The configuration variable `*unused-declarations-behavior*` controls
+what `bind` does:
+
+{docs *unused-declarations-behavior*}
+
 ## More bindings
 
 Since bind is extensible and I'm fallible, there are probably
@@ -299,16 +351,27 @@ the following commands to see what bind can do:
 {docs binding-form-synonyms}
 
 
+## `lambda-bind`
+
+Eric Schulte contributed `lambda-bind` (note, he called it
+`lambdab` but I dislike abbreviations so...):
+
+{docs lambda-bind}
+
+
 ## Extending bind yourself
 
 Bind's syntax is extensible: the work for each
 binding-specification is handled by a generic function. This
 means that you can evolve bind to fit your program for
-whatever sort of data-structure makes sense for you.
+whatever sort of data-structure makes sense for you. To make
+a binding form, you can either define a method for `bind-generate-bindings`
+or you can use the `defbinding-form` macro.
 
-Details on this mechanism are coming soon, sidereal speaking.
- (if you're
-impatient, you can look at the source code for the methods of
-`bind-generate-bindings`).
+{docs bind-generate-bindings}
+
+{docs defbinding-form}
+
+There are many more examples included in the source code.
 
 {include resources/guide-footer.md}
