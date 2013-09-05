@@ -142,8 +142,9 @@ where each `structure-spec` is an atom or list with two elements:
 				     var)))
 		   `(,var-var (,(intern 
 				 (format nil "~a~a" 
-					 conc-name var-conc)) 
-				,values)))))))
+					 conc-name var-conc)
+                                 (symbol-package conc-name))
+                               ,values)))))))
 
 (defbinding-form ((:structure/rw)
 		  :docstring
@@ -175,7 +176,8 @@ structure references. Declarations are handled using `the`.
 				  var))
 		     (var-conc (or (and (consp var) (second var))
 				   var))
-		     (var-name (intern (format nil "~a~a" conc-name var-conc)))
+		     (var-name (intern (format nil "~a~a" conc-name var-conc)
+                                       (symbol-package conc-name)))
 		     (type-declaration (find-type-declaration var-var declarations)))
 		 `(,var-var ,(if type-declaration
 				 `(the ,type-declaration (,var-name ,values))
