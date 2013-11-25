@@ -70,10 +70,41 @@ When the function definition occurs in a progn. For example:
 		(progn ,@body)))))))
 
 
+(defbinding-form ((:dynamic-flet :dflet)
+		     :docstring "Local functions are defined using
+
+    \(:dynamic-flet <name> \(<lambda list>\) <function definition>\)
+
+Where the function definition occurs in a progn. For example:
+
+    \(bind \(\(\(:flet double-list \(x\)\) \(setf x \(* 2 x\)\) \(list x x\)\)\)
+        \(double-list 45\)\)
+    ==> (90 90)
+
+The functions are automatically declared dynamic-extent
+"
+		     :use-values-p nil
+		     :accept-multiple-forms-p t)
+  (destructuring-bind (name args) variables
+    (let* (declaration body docstring)
+      (when (typep (first values) 'string)
+	(setf docstring (first values)
+	      values (rest values)))
+      (when (and (listp (first values)) (eq (caar values) 'declare))
+	(setf declaration (first values)
+	      values (rest values)))
+      (setf body values)
+      `(flet ((,name ,args
+		,@(when docstring `(,docstring))
+		,@(when declaration `(,declaration))
+		(progn ,@body))) 
+	 (declare (dynamic-extent (function ,name)))))))
+
+
 (defbinding-form (:labels
 		     :docstring "Local functions are defined using
 
-    \(:flet <name> \(<lambda list>\) <function definition>\)
+    \(:labels <name> \(<lambda list>\) <function definition>\)
 
 When the function definition occurs in a progn. For example:
 
@@ -97,6 +128,38 @@ When the function definition occurs in a progn. For example:
 		  ,@(when docstring `(,docstring))
 		  ,@(when declaration `(,declaration))
 		  (progn ,@body)))))))
+
+
+(defbinding-form ((:dynamic-labels :flabels)
+		     :docstring "Local functions are defined using
+
+    \(:dynamic-labels <name> \(<lambda list>\) <function definition>\)
+
+When the function definition occurs in a progn. For example:
+
+    \(bind \(\(\(:flet double-list \(x\)\) \(setf x \(* 2 x\)\) \(list x x\)\)\)
+        \(double-list 45\)\)
+    ==> (90 90)
+
+The functions are automatically declared dynamic-extent
+
+"
+		     :use-values-p nil
+		     :accept-multiple-forms-p t)
+  (destructuring-bind (name args) variables
+    (let* (declaration body docstring)
+      (when (typep (first values) 'string)
+	(setf docstring (first values)
+	      values (rest values)))
+      (when (and (listp (first values)) (eq (caar values) 'declare))
+	(setf declaration (first values)
+	      values (rest values)))
+      (setf body values)
+      `(labels ((,name ,args
+		  ,@(when docstring `(,docstring))
+		  ,@(when declaration `(,declaration))
+		  (progn ,@body)))
+	 (declare (dynamic-extent (function ,name)))))))
 
 
 (defbinding-form (cons
