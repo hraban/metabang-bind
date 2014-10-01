@@ -452,3 +452,7 @@ keywords as keys. For example:
 #+(or)
 (bind (((:plist- a (b _) (c _ 2) (dd d)) '(b "B" a "A" d "D")))
   (list a b c dd))
+
+(defbinding-form (:file :use-values-p nil
+			:accept-multiple-forms-p t)
+  `(with-open-file ,(append variables  (car values))))
