@@ -74,7 +74,7 @@ form.)
 	 #+(or)
 	 (gignores (gensym "ignores")))    
     (cond (multiple-names?
-	   (setf main-method-name (gensym (symbol-name '#:binding-generator)))
+	   (setf main-method-name (gentemp (symbol-name '#:binding-generator)))
 	   )
 	  (t
 	   (setf main-method-name 'bind-generate-bindings)
