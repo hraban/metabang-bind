@@ -517,3 +517,19 @@ keywords as keys. For example:
 #+(or)
 (bind (((:plist- a (b _) (c _ 2) (dd d)) '(b "B" a "A" d "D")))
   (list a b c dd))
+
+
+(defbinding-form (:file :use-values-p nil
+			:accept-multiple-forms-p t)
+		  "The binding form for a file is as follows:
+
+    ((:file stream-var) file-name | (file-name arguments*))
+
+E.g.,
+
+    (bind (((:file s) (\"/tmp/foo.tmp\" :direction :output :if-does-not-exist :create)))
+      ...)
+
+"
+  ;; thanks to https://github.com/hyotang666 for the idea and initial code!
+  `(with-open-file ,(append variables (if (null (cdr values)) values (car values)))))
