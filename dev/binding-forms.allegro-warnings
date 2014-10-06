@@ -1,0 +1,15 @@
+(:functions-defined
+ (metabang.bind::handle-plist #:binding-generator988718
+  #:binding-generator988681 #:binding-generator988638
+  #:binding-generator988576 #:binding-generator988534
+  metabang.bind::find-type-declaration #:binding-generator988492
+  #:binding-generator988455 metabang.bind::bind-generate-bindings)
+ :functions-called
+ ((metabang.bind::handle-plist
+   (#P"/Users/gwkkwg/repository/metabang-bind/dev/binding-forms.lisp"
+    13537 13537)
+   (#P"/Users/gwkkwg/repository/metabang-bind/dev/binding-forms.lisp"
+    12433 12433))
+  (metabang.bind::find-type-declaration
+   (#P"/Users/gwkkwg/repository/metabang-bind/dev/binding-forms.lisp"
+    5003 5003))))

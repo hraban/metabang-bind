@@ -1,0 +1,7 @@
+(:functions-defined
+ (metabang.bind::next-value (setf metabang.bind:binding-form-docstring)
+  metabang.bind:binding-form-docstring)
+ :functions-called
+ ((metabang.bind:binding-form-docstring
+   (#P"/Users/gwkkwg/repository/metabang-bind/dev/macros.lisp" 145
+    145))))

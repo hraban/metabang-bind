@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>test configuration file</title>
+<link type='text/css' href='test-style.css' rel='stylesheet' />
+</head>
+<body>
+<h1>Test configuration</h1>
+<pre>
+
+(:if-dribble-exists :supersede) 
+(:dribble "metabang-bind.dribble") 
+(:print-length 10) 
+(:print-level 5) 
+(:print-test-case-names t) 
+(metabang-bind-test) 
+(:report-property :title "Metabang-Bind | Test results") 
+(:report-property :relative-to metabang-bind-test) 
+(:report-property :style-sheet "test-style.css") 
+(:report-property :if-exists :supersede) 
+(:report-property :format :html) 
+(:report-property :name "test-report") 
+(:report-property :unique-name t) 
+(:build-report) 
+(:report-property :name "test-report") 
+(:report-property :unique-name nil) 
+(:build-report) 
+(:report-property :format :brief) 
+(:report-property :full-pathname *standard-output*) 
+(:build-report) 
+</pre>
+<div id="footer">
+generated on December 31, 2012 17:20:25 GMT-0500</div>
+</body></html>
