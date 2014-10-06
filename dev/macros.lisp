@@ -163,7 +163,7 @@ This lets you funcall and destructure simultaneously. For example
 
 Via eschulte (see git://gist.github.com/902174.git).
 "
-  #-allegro
+  #-(or)
   (declare (indent 1))
   (let* ((evald-instrs instrs)
          (syms (mapcar (lambda (_)
