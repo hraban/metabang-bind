@@ -1,7 +1,6 @@
 (in-package #:metabang.bind)
 
-(defgeneric bind-generate-bindings (kind variable-form value-form
-					 body declarations remaining-bindings)
+(defgeneric bind-generate-bindings (kind variable-form value-form)
   (:documentation "Handle the expansion for a particular binding-form.
 
 `kind` specifies the binding form. It can be a type (e.g., symbol or array)
@@ -15,13 +14,7 @@ taken from the binding-form given to `bind`. E.g., if you have a bind like
 
 then `kind` will be :values, `variable-form` will be the list `(a b c)` and
 `value-form` will be the expression `(foo)`. `bind-generate-bindings` 
-uses these variables as data to construct the generated code. `body` contains
-the rest of the code passed to `bind` (the `...`) above in this case) and can
-usually be ignored. `declarations` contains all of the declarations from the 
-`bind` form (e.g. the `optimize (speed 3)` and so on) and should be used to 
-insert whatever declarations match at this particular point in the expansion.
-Use [bind-filter-declarations][] to do this easily). Finally, remaining-bindings
-contains the rest of the binding-forms. It can also be safely ignored."))
+uses these variables as data to construct the generated code."))
 
 (defbinding-form (array
 		  :use-values-p t)
@@ -37,7 +30,7 @@ contains the rest of the binding-forms. It can also be safely ignored."))
 		  :use-values-p nil)
   (if (keywordp kind)
       (error "Don't have a binding form for ~s" kind)
-      `(let (,@(if values
+      `(let* (,@(if values
 		   `((,variables ,values))
 		   `(,variables))))))
 
@@ -241,7 +234,7 @@ structure references. Declarations are handled using `the`.
 				   var))
 		     (var-name (intern (format nil "~a~a" conc-name var-conc)
                                        (symbol-package conc-name)))
-		     (type-declaration (find-type-declaration var-var declarations)))
+		     (type-declaration (find-type-declaration var-var *all-declarations*)))
 		 `(,var-var ,(if type-declaration
 				 `(the ,type-declaration (,var-name ,values))
 				 `(,var-name ,values))))))))

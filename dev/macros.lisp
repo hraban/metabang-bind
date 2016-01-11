@@ -71,14 +71,11 @@ form.)
 	 (force-keyword? (or multiple-names?
 			     (eq (symbol-package name/s) 
 				 (load-time-value (find-package :keyword)))))
-	 #+(or)
-	 (gignores (gensym "ignores")))    
+	 (gnew-form (gensym "new-form")))
     (cond (multiple-names?
-	   (setf main-method-name (gensym (symbol-name '#:binding-generator)))
-	   )
+	   (setf main-method-name (gensym (symbol-name '#:binding-generator))))
 	  (t
-	   (setf main-method-name 'bind-generate-bindings)
-	   ))
+	   (setf main-method-name 'bind-generate-bindings)))
     (flet ((form-keyword (name)
 	     (intern (symbol-name name)
 		     (load-time-value (find-package :keyword)))))
@@ -98,56 +95,40 @@ form.)
                       (if force-keyword?
                           `((kind (eql ,name/s)))
                           `((kind ,name/s))))
-	      variable-form value-form body declarations remaining-bindings)
+	      variable-form value-form)
+	   ;;?? Can (symbolp (first body)) ever be true?
 	   ,(if use-values-p
-		;; surely this could be simpler!
-		`(let ((gvalues (next-value "values-")))
-		   `((let ((,gvalues ,,(if accept-multiple-forms-p 
-					   `value-form
-					   `(first value-form))))
-		       (declare (ignorable ,gvalues))
-		       (,@,(if (symbolp (first body))
-			       `(,(first body) variable-form gvalues)
-			       `(funcall (lambda (variables values) ,@body)
-					 variable-form gvalues))
-					;		 ,@(when ,gignores `((declare (ignore ,@gignores))))
-			   ,@(bind-filter-declarations 
-			      declarations variable-form)
-			   ,@(bind-macro-helper 
-			      remaining-bindings declarations body)))))
-		``((,@,(if (symbolp (first body))
-			   `(,(first body) variable-form ,(if accept-multiple-forms-p
-							      `value-form
-							      `(first value-form)))
-			   `(funcall (lambda (variables values) ,@body)
-				     variable-form ,(if accept-multiple-forms-p
+		`(let* ((gvalues (next-value "values-"))
+			(,gnew-form (funcall (lambda (variables values) ,@body)
+					     variable-form gvalues)))
+		   (destructuring-bind (TAG . REST)
+		       ,gnew-form
+		     ;;?? CASE 
+		     (if (or (eq TAG 'let) (eq TAG 'let*))
+			 (destructuring-bind (let-bindings . after-bindings)
+			     REST
+			   (values `(let* ((,gvalues ,,(if accept-multiple-forms-p 
+							   `value-form
+							   `(first value-form)))
+					   ,@let-bindings)
+				      (declare (ignorable ,gvalues))
+				      ,@after-bindings)
+				   nil))
+			 (values `(let* ((,gvalues ,,(if accept-multiple-forms-p 
 							`value-form
 							`(first value-form))))
-		       ,@(bind-filter-declarations declarations variable-form)
-		       ,@(bind-macro-helper 
-			  remaining-bindings declarations body)))))
+				   (declare (ignorable ,gvalues))
+				   ,,gnew-form)
+				 t))))
+		`(let ((,gnew-form (funcall (lambda (variables values) ,@body)
+					    variable-form ,(if accept-multiple-forms-p
+							       `value-form
+							       `(first value-form)))))
+		   (values ,gnew-form nil))))
 	 ,@(when multiple-names?
 		 (loop for name in name/s collect
-		      `(defmethod bind-generate-bindings 
-			   ((kind (eql ,name))
-			    variable-form value-form body declarations 
-			    remaining-bindings)
-			 (,main-method-name 
-			  variable-form value-form body declarations 
-			  remaining-bindings))))
-	 #+(or)
-	 ,@(when multiple-names?
-		 (loop for name in name/s collect
-		      `(defmethod bind-generate-bindings 
-			   ((kind (eql ,name))
-			    variable-form value-form body declarations 
-			    remaining-bindings)
-			 (,main-method-name 
-			  variable-form
-			  ,(if accept-multiple-forms-p `value-form `(first value-form))
-			  body declarations 
-			  remaining-bindings))))
-	 ))))
+		      `(defmethod bind-generate-bindings ((kind (eql ,name)) variable-form value-form)
+			 (,main-method-name variable-form value-form))))))))
 
 (defun next-value (x)
   (gensym x))

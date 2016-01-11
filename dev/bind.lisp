@@ -7,6 +7,9 @@ See the file COPYING for details
 |#
 
 (in-package #:metabang.bind) 
+
+(defconstant +code-marker+ :XXX)
+(defconstant +decl-marker+ :YYY)
     
 (defgeneric binding-form-accepts-multiple-forms-p (binding-form)
   (:documentation "Returns true if a binding form can accept multiple forms
@@ -149,7 +152,7 @@ in a binding is a list and the first item in the list is ':values'."
     (if bindings
 	(let ((*all-declarations* (bind-expand-declarations (nreverse declarations))))
 	  (prog1
-	      (first (bind-macro-helper bindings *all-declarations* body))
+	      (bind-macro-helper bindings body)
 	    (check-for-unused-variable-declarations *all-declarations*)))
         `(locally
              ,@declarations
@@ -167,7 +170,7 @@ in a binding is a list and the first item in the list is ':values'."
 	       declarations)
        (signal 'bind-unused-declarations-condition :unused-declarations declarations)))))
 
-(defun bind-macro-helper (bindings declarations body)
+(defun bind-macro-helper (bindings body)
   (if bindings
       (let ((binding (first bindings))
 	    (remaining-bindings (rest bindings))
@@ -191,17 +194,34 @@ in a binding is a list and the first item in the list is ':values'."
 		       (not (binding-form-accepts-multiple-forms-p binding-form))))
 	  (error 'bind-too-many-value-forms-error 
 		:variable-form variable-form :value-form value-form))
-	;;(print (list :vf variable-form :value value-form :a atomp :b binding-form))
-	(if binding-form
-	    (bind-generate-bindings 
-	     (first variable-form)
-	     (rest variable-form)
-	     value-form body declarations remaining-bindings)
-	    (bind-generate-bindings
-	     variable-form
-	     variable-form
-	     value-form body declarations remaining-bindings)))
-      body))
+	(let* ((body (bind-macro-helper remaining-bindings body))
+	       (variables (if binding-form (rest variable-form) variable-form))
+	       (decls (bind-filter-declarations variables)))
+	  (multiple-value-bind (form double-indent)
+	      (if binding-form
+		  ;; e.g., (:values ...)
+		  (bind-generate-bindings (first variable-form) (rest variable-form) value-form)
+		  ;; e.g., #(a b c)
+		  (bind-generate-bindings variable-form variable-form value-form))
+	    (cond ((or (tree-find form +code-marker+)
+		       (tree-find form +decl-marker+))
+		   (setf form (subst body +code-marker+ form))
+		   (setf form (subst decls +decl-marker+ form)))
+		  (double-indent
+		   `(,@(butlast form) (,@(first (last form)) ,@decls ,body)))
+		  ((merge-binding-forms-p form body)
+		   (destructuring-bind (head1 form1-bindings . form1-code)
+		       form
+		     (destructuring-bind (_ form2-bindings . form2-code)
+			 body
+		       (declare (ignore _))
+		       `(,head1 (,@form1-bindings ,@form2-bindings)
+				,@decls 
+				,@form1-code
+				,@form2-code))))
+		  (t
+		   `(,@form ,@decls ,body))))))
+      `(progn ,@body)))
 
 ;;;;
 
@@ -251,12 +271,19 @@ in a binding is a list and the first item in the list is ':values'."
        (cdr putative-pair)
        (not (consp (cdr putative-pair)))))
 
+(defmethod bind-collect-variables (kind variable-form)
+  (declare (ignore kind))
+  variable-form)
+
 (defun bind-get-vars-from-lambda-list (lambda-list)
   (let ((result nil))
     (labels ((do-it (thing)
-	       (cond ((atom thing) 
+	       (cond ((arrayp thing)
+		      (loop for i below (array-total-size thing)
+			 for var = (row-major-aref thing i) do (do-it var)))
+		     ((atom thing) 
 		      (unless (or (member thing *bind-lambda-list-markers*)
-				  (null thing))
+				  (var-ignorable-p thing))
 			(push thing result)))
 		     ((dotted-pair-p thing)
 		      (do-it (car thing)) 
@@ -266,11 +293,6 @@ in a binding is a list and the first item in the list is ':values'."
 		      (do-it (cdr thing))))))
       (do-it lambda-list))
     (nreverse result)))
-
-#+(or)
-(loop for item in lambda-list 
-   unless (member item *bind-lambda-list-markers*) collect
-     (if (consp item) (first item) item))
 
 (defun bind-expand-declarations (declarations)
   (loop for declaration in declarations append
@@ -287,12 +309,12 @@ in a binding is a list and the first item in the list is ':values'."
                      (loop for var in (rest decl) collect
                            `(type ,(first decl) ,var)))))))
 
-(defun bind-filter-declarations (declarations var-names)
+(defun bind-filter-declarations (var-names)
   (setf var-names (if (consp var-names) var-names (list var-names)))  
   (setf var-names (bind-get-vars-from-lambda-list var-names))
   ;; each declaration is separate
   (let ((declaration
-         (loop for declaration in declarations 
+         (loop for declaration in *all-declarations*
                when (or (member (first declaration)
 				*bind-non-var-declarations*)
                         (and (member (first declaration)
@@ -310,6 +332,32 @@ in a binding is a list and the first item in the list is ':values'."
 		declaration))))
     (when declaration 
       `((declare ,@declaration)))))
+
+(defun merge-binding-forms-p (form1 form2)
+  (and (consp form1) (consp form2)
+       (let ((tag1 (first form1))
+	     (tag2 (first form2)))
+	 (and (symbolp tag1)
+	      (symbolp tag2)
+	      (string-equal (symbol-name tag1) (symbol-name tag2))
+	      (or (string-equal (symbol-name tag1) "let")
+		  (string-equal (symbol-name tag1) "let*")
+		  (string-equal (symbol-name tag1) "labels"))))))
+
+(defun map-tree (fn object)
+  "apply `fn` to every leaf of `object`."
+  (cond ((consp object)
+         (map-tree fn (car object))
+         (map-tree fn (cdr object)))
+        (object
+         (funcall fn object))))
+
+(defun tree-find (tree it &key (test #'eq) (key #'identity))
+  (flet ((isit (atom)
+           (when key (setf atom (funcall key atom)))
+           (when (funcall test it atom) (return-from tree-find t))))
+    (declare (dynamic-extent #'isit))
+    (map-tree #'isit tree)))
 
 ;;; fluid-bind
 
