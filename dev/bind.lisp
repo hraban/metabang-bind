@@ -139,12 +139,17 @@ An example is probably the best way to describe its syntax:
 
     \(bind \(\(a 2\)
            \(\(b &rest args &key \(c 2\) &allow-other-keys\) '\(:a :c 5 :d 10 :e 54\)\)
-           \(\(:values d e\) \(truncate 4.5\)\)\)
+           \(\(:values d e\) \(truncate 4.5\)\)
+           \(\(:structure xxx- slot1 slot2\) \(make-xxx\)\)
+           \(\(:flet name \(arg1 arg2\)\) \(+ arg1 arg2\)\)\)
          \(list a b c d e args\)\)
 
 Simple bindings are as in let*. Destructuring is done if the first item
 in a binding is a list. Multiple value binding is done if the first item
-in a binding is a list and the first item in the list is ':values'."
+in a binding is a list and the first item in the list is ':values'. Other
+forms have their own syntax. For example, :structure first has the conc
+name and then slot names whereas :flet has the function name and a list
+of arguments and then the function body (in an implicit progn)."
   (let (declarations)
     (loop while (and (consp (car body)) (eq (caar body) 'declare)) do
           (push (first body) declarations)

@@ -162,8 +162,8 @@ The functions are automatically declared dynamic-extent
     `(destructuring-bind ,vars ,values
 	,@(when ignores `((declare (ignore ,@ignores)))))))
 
-(defbinding-form (:values
-		  :docstring "" 
+(defbinding-form ((:values :mv-bind :multiple-value-bind)
+		  :docstring "Expands into a multiple-value-bind" 
 		  :use-values-p nil)
   (multiple-value-bind (vars ignores)
       (bind-fix-nils variables)
