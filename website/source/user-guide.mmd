@@ -50,11 +50,11 @@ the keyword ':values'.
 Bind mimics let in its general syntax:
 
     (bind (&rest bindings) <body>)
-
+    
 where each `binding` can either be an symbol or a list. If the binding is an atom, then this atom will be bound to nil within the body (just as in let). If it is a list, then it will be interpreted depending on its first form.
 
     (bind (a
-           (...))
+           (...)) 
       ...)
 
 ### Bind as a replacement for let
@@ -84,11 +84,11 @@ How could we use bind for these:
       (list a b c d))
     => (1 2 3 4)
 
-Note that `bind` makes it a little easier to ignore variables you don't care about.
-Suppose I've got a function `ijara` that returns 3 values and I happen to need only
+Note that `bind` makes it a little easier to ignore variables you don't care about. 
+Suppose I've got a function `ijara` that returns 3 values and I happen to need only 
 the second two. Using `destructuring-bind`, I'd write:
 
-    (destructuring-bind (foo value-1 value-2)
+    (destructuring-bind (foo value-1 value-2) 
         (ijira)
       (declare (ignore foo))
       ...)
@@ -117,24 +117,24 @@ You can use `getf` to find the current value of a property in a list (and `setf`
           (fuzz (getf plist :fuzziness 'no)))
       (list start end fuzz))
     => (368421722 368494926 no)
-
+   
 The binding form for property-lists is as follows:
 
     (:plist property-spec*)
-
+    
 where each property-spec is an atom or a list of up to three elements:
 
 * atoms bind a variable with that name to
-a property with the same name (converting the name to a keyword in order to do the lookup).
+a property with the same name (converting the name to a keyword in order to do the lookup). 
 
 * lists with a single element are treated like atoms.
 
 * lists with two elements
 specify the variable in the first and the name of the
-property in the second.
+property in the second. 
 
 * Lists with three elements use
-the third element to specify a default value (if the
+the third element to specify a default value (if the 
 second element is #\_, then the property name is taken
 to be the same as the variable name).
 
@@ -161,7 +161,7 @@ where each `structure-spec` is an atom or list with two elements:
 
 * an atom specifies both the name of the variable to which the structure field is bound and the field-name in the structure.
 
-* a list has the variable name as its first item and the structure field name as its second.
+* a list has the variable name as its first item and the structure field name as its second. 
 
 So if we have a structure like:
 
@@ -185,23 +185,23 @@ You can read the slot of an instance with an accessor (if one exists) or by usin
 
     (:slots slot-spec*)
     (:accessors accessor-spec*)
-
+    
 Where both slot-spec and accessor-spec can be atoms or lists with two elements.
 
 * an atom tells bind to use it as the name of the new variable _and_ to treat this name as the name of the slot or the name of the accessor, respectively.
 
-* If the specification is a list, then bind will use the first item as the variable's name and the second item as the slot-name or accessor.
+* If the specification is a list, then bind will use the first item as the variable's name and the second item as the slot-name or accessor. 
 
 Support we had a class like:
 
     (defclass wicked-cool-class ()
       ((a :initarg :a :accessor its-a)
-       (b :initarg :b :accessor b)
+       (b :initarg :b :accessor b) 
        (c :initarg :c :accessor just-c)))
 
 If we don't mind using the slot-names as variable names, then we can use the simplest form of `:slots`:
 
-    (bind (((:slots a b c)
+    (bind (((:slots a b c) 
     	(make-instance 'wicked-cool-class
     		       :a 1 :b 2 :c 3)))
       (list a b c))
@@ -209,7 +209,7 @@ If we don't mind using the slot-names as variable names, then we can use the sim
 
 We can also change the names within the context of our bind form:
 
-    (bind (((:slots a b (dance-count c))
+    (bind (((:slots a b (dance-count c)) 
     	(make-instance 'wicked-cool-class
     		       :a 1 :b 2 :c 3)))
       (list a b dance-count))
@@ -217,7 +217,7 @@ We can also change the names within the context of our bind form:
 
 Similarly, we can use `:accessors` with variable names that are the same as the accessor names...
 
-    (bind (((:accessors its-a b just-c)
+    (bind (((:accessors its-a b just-c) 
     	(make-instance 'wicked-cool-class
     		       :a 1 :b 2 :c 3)))
       (list its-a b just-c))
@@ -225,7 +225,7 @@ Similarly, we can use `:accessors` with variable names that are the same as the 
 
 or that are different:
 
-    (bind (((:accessors (a its-a) b (c just-c))
+    (bind (((:accessors (a its-a) b (c just-c)) 
     	(make-instance 'wicked-cool-class
     		       :a 1 :b 2 :c 3)))
       (list a b c))
@@ -235,7 +235,7 @@ or that are different:
 
 ### Bind with arrays
 
-Tamas Papp had the idea of letting `bind` handle arrays too. For example,
+Tamas Papp had the idea of letting `bind` handle arrays too. For example, 
 
     (bind ((#(a b c) #(1 2 3)))
       (list a b c))
@@ -250,7 +250,7 @@ can use `bind` with regular expressions too. The syntax is
 
     (:re expression &rest vars) string)
 
-and will bind each grouped item in the expression to the
+and will bind each grouped item in the expression to the 
 corresponding var. For example:
 
     (bind (((:re "(\\w+)\\s+(\\w+)\\s+(\\d{1,2})\\.(\\d{1,2})\\.(\\d{4})"
@@ -262,8 +262,8 @@ does not match.
 
 ### Bind with `flet` and `labels`
 
-Bind can even be used as a replacement for `flet` and `labels`.
-The syntax is
+Bind can even be used as a replacement for `flet` and `labels`. 
+The syntax is 
 
     (:flet function-name (arguments*)) definition)
 
@@ -283,15 +283,15 @@ for example:
     ==> t
 
 Note that bind currently expands each binding-form into a new context. In
-particular, this means that
+particular, this means that 
 
     (bind (((:flet x (a)) (* a 2))
            ((:flet y (b)) (+ b 2)))
       ...)
 
-expands as
+expands as 
 
-    (flet ((x (a) (progn (* a 2))))
+    (flet ((x (a) (progn (* a 2)))) 
       (flet ((y (b) (progn (+ b 2))))
         ...))
 
@@ -306,7 +306,7 @@ Generally speaking, this shouldn't make much of a difference.
 ## `bind` and declarations
 
 `bind` handles declarations transparently by splitting them
-up and moving them to the correct place in the expansion. For
+up and moving them to the correct place in the expansion. For 
 example
 
     (bind (((:values a b) (foo x))
@@ -316,7 +316,7 @@ example
       (list a b d e))
 
 becomes
-
+  
     (multiple-value-bind (a b)
         (foo x)
       (declare (type fixnum a) (optimize (speed 3)))
@@ -326,9 +326,9 @@ becomes
           (declare (optimize (speed 3)))
           (list a b d e))))
 
-because `bind` knows to keep the variable declarations
-(like `type`) with their variables and to repeat
-other declarations (like `optimize`) at each level.
+because `bind` knows to keep the variable declarations 
+(like `type`) with their variables and to repeat 
+other declarations (like `optimize`) at each level. 
 
 `bind` keeps track of variables declarations that are not used.
 The configuration variable `*unused-declarations-behavior*` controls

@@ -1,8 +1,7 @@
 (in-package #:metabang.bind.developer)
 
-(defmethod bind-generate-bindings
-    ((kind (eql :re)) variable-form value-form
-     body declarations remaining-bindings)
+#+wrong
+(defmethod bind-generate-bindings ((kind (eql :re)) variable-form value-form)
   ;; (:re "re" vars)
   (bind (((regex &rest vars) variable-form)
 	 (gok (gensym "ok"))
@@ -24,19 +23,12 @@
 	    (unless ,gok
 	      (doit ,@(make-list (length vars) :initial-element nil)))))))))
 
-#+(or)
 ;; simple but doesn't execute inner code if no bindings found
 ;; which isn't very bind-like
-(defmethod bind-generate-bindings
-    ((kind (eql :re)) variable-form value-form
-     body declarations remaining-bindings)
+(defmethod bind-generate-bindings ((kind (eql :regex)) variable-form value-form)
   ;; (:re "re" vars)
   (bind (((regex &rest vars) variable-form))
-    `((cl-ppcre:register-groups-bind ,vars (,regex ,(first value-form) :sharedp t)
-       ,(bind-filter-declarations
-	 declarations variable-form)
-       ,@(bind-macro-helper
-	  remaining-bindings declarations body)))))
+    `((cl-ppcre:register-groups-bind ,vars (,regex ,(first value-form) :sharedp t)))))
 
 #+(or)
 ;; doesn't handle ignores

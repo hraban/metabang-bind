@@ -33,7 +33,7 @@
     (ensure-same (doit 2) 7)))
 
 (addtest (test-flet)
-  docstring-and-declarations
+  docstring-and-declarations-1
   (bind (((:flet doit (x))
 	  "whatever"
 	  (declare (type fixnum x))
@@ -44,7 +44,7 @@
     (ensure-same (doit 2) 7)))
 
 (addtest (test-flet)
-  docstring-and-declarations
+  docstring-and-declarations-2
   (bind (((:flet constant (x))
 	  (declare (ignore x))
 	  42))
@@ -85,7 +85,7 @@
     (ensure-same (doit 2) 7)))
 
 (addtest (test-labels)
-  docstring-and-declarations
+  docstring-and-declarations-1
   (bind (((:labels doit (x))
 	  "whatever"
 	  (declare (type fixnum x))
@@ -96,7 +96,7 @@
     (ensure-same (doit 2) 7)))
 
 (addtest (test-labels)
-  docstring-and-declarations
+  docstring-and-declarations-2
   (bind (((:labels constant (x))
 	  (declare (ignore x))
 	  42))
