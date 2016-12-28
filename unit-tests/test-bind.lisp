@@ -77,6 +77,14 @@
     (ensure-same (fifth vars) (first ignores))
     (ensure-same (fourth vars) '(c 1) :test 'equal)))
 
+(addtest (test-bind-fix-nils-destructured)
+  keyword-list-with-nil-default
+  (multiple-value-bind (vars ignores)
+                       (bind-fix-nils-destructured '(a b &key (c nil c?)))
+    (ensure-same (length ignores) 0)
+    (ensure-same (subseq vars 0 3) '(a b &key) :test #'equal)
+    (ensure-same (fourth vars) '(c nil c?) :test 'equal)))
+
 #+Ignore
 ;;?? not yet
 (addtest (test-bind-fix-nils-destructured)
