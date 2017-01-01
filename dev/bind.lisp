@@ -249,26 +249,27 @@ of arguments and then the function body (in an implicit progn)."
 
 (defun bind-fix-nils-destructured (var-list)
   (let ((ignores nil))
-    (labels (;; adapted from metatilities 
-             (tree-map (fn tree)
-               "Maps FN over every atom in TREE."
-               (cond
-                ;; ((null tree) nil)
-                ((atom tree) (funcall fn tree))
-                (t
-                 (cons
-                  (tree-map fn (car tree))
-                  (when (cdr tree) (tree-map fn (cdr tree))))))))
-      
-      (values (tree-map
-               (lambda (x)
-                 (cond ((var-ignorable-p x) 
-			(let ((ignore (mint-ignorable-variable)))
-			  (push ignore ignores)
-			  ignore))
-                       (t x)))
-               var-list)
-              ignores))))
+    (flet ((maybe-handle-1 (x)
+	     (if (var-ignorable-p x)
+		 (let ((ignore (mint-ignorable-variable)))
+		   (push ignore ignores)
+		   ignore)
+		 x)))
+    (labels ((do-it (it key?)
+	       (cond ((null it)
+		      nil)
+		     ((atom it)
+		      (maybe-handle-1 it))
+		     ((dotted-pair-p it)
+		      (cons (do-it (car it) key?) (do-it (cdr it) key?)))
+		     ((eq (first it) '&key)
+		      (loop for x in it collect (do-it x t)))
+		     (key?
+		      it)
+		     (t
+		      (cons (do-it (car it) key?)
+			    (do-it (cdr it) key?))))))
+      (values (do-it var-list nil) ignores)))))
 
 (defun dotted-pair-p (putative-pair)
   "Returns true if and only if `putative-pair` is a dotted-list. I.e., if `putative-pair` is a cons cell with a non-nil cdr."
