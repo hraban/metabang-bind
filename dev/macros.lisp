@@ -83,7 +83,7 @@ form.)
 	(setf name/s (if multiple-names? 
 			 (mapcar #'form-keyword name/s)
 			 (form-keyword name/s))))
-      `(progn
+      `(let ()
 	 (setf (binding-form-docstring ',name/s) ,docstring)
 	 ,@(loop for name in (if multiple-names? name/s (list name/s)) 
 	       when (keywordp name) collect
