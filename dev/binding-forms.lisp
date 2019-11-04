@@ -196,11 +196,9 @@ where each `structure-spec` is an atom or list with two elements:
 				    var))
 		       (var-conc (or (and (consp var) (second var))
 				     var)))
-		   `(,var-var (,(intern
-				 (format nil "~a~a"
-					 conc-name var-conc)
-                                 (symbol-package conc-name))
-                               ,values)))))))
+		   `(,var-var (,(let ((*package* (symbol-package conc-name)) *read-eval*)
+				  (read-from-string (format nil "~a~a" conc-name var-conc)))
+				,values)))))))
 
 (defbinding-form ((:structure/rw)
 		  :docstring
@@ -229,12 +227,14 @@ structure references. Declarations are handled using `the`.
     `(symbol-macrolet
 	 ,(loop for var in vars collect
 	       (let* ((var-var (or (and (consp var) (first var))
-				  var))
-		     (var-conc (or (and (consp var) (second var))
 				   var))
-		     (var-name (intern (format nil "~a~a" conc-name var-conc)
-                                       (symbol-package conc-name)))
-		     (type-declaration (find-type-declaration var-var *all-declarations*)))
+		      (var-conc (or (and (consp var) (second var))
+				    var))
+		      
+		      (var-name (let ((*package* (symbol-package conc-name)) *read-eval*)
+				  (read-from-string (format nil "~a~a" conc-name var-conc))))
+		      
+		      (type-declaration (find-type-declaration var-var *all-declarations*)))
 		 `(,var-var ,(if type-declaration
 				 `(the ,type-declaration (,var-name ,values))
 				 `(,var-name ,values))))))))
@@ -496,7 +496,8 @@ keywords as keys. For example:
 		 (when (string= (symbol-name var-key) "_")
 		   (setf var-key var-name))
 		 (when form-keywords?
-		   (setf var-key (intern (symbol-name var-key) :keyword)))
+		   (setf var-key (let ((*package* (find-package :keyword)) *read-eval*)
+				   (read-from-string (symbol-name var-key)))))
 		 `(,var-name (getf ,values
 				   ,(if form-keywords?
 					var-key `',var-key)
