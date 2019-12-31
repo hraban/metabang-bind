@@ -133,7 +133,7 @@ form.)
 (defun next-value (x)
   (gensym x))
 
-(defmacro lambda-bind ((&rest instrs) &rest body)
+(defmacro lambda-bind ((&rest instrs) &body body)
   "Use `bind' to allow restructuring of argument to lambda expressions.
 
 This lets you funcall and destructure simultaneously. For example
