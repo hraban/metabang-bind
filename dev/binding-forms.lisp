@@ -496,8 +496,7 @@ keywords as keys. For example:
 		 (when (string= (symbol-name var-key) "_")
 		   (setf var-key var-name))
 		 (when form-keywords?
-		   (setf var-key (let ((*package* (find-package :keyword)) *read-eval*)
-				   (read-from-string (symbol-name var-key)))))
+		   (setf var-key (intern (symbol-name var-key) (find-package :keyword))))
 		 `(,var-name (getf ,values
 				   ,(if form-keywords?
 					var-key `',var-key)
