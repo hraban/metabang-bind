@@ -64,6 +64,10 @@ This binding form tells to expand clauses whose first element is
 a symbol using `let`. (It also gets `bind` to signal an error if
 the first element is a keyword that doesn't have a defined binding
 form.)
+
+If `use-values-p` is T, first bind value forms to gensyms to ensure
+they are evaluated only once. If `accept-multiple-forms-p` is T, allow
+passing multiple value forms, otherwise doing so results in an error.
 "
   (declare (ignorable remove-nils-p description))
   (let* ((multiple-names? (consp name/s))
@@ -86,9 +90,9 @@ form.)
       `(let ()
 	 (setf (binding-form-docstring ',name/s) ,docstring)
 	 ,@(loop for name in (if multiple-names? name/s (list name/s)) 
-	       when (keywordp name) collect
-		`(defmethod binding-form-accepts-multiple-forms-p 
-		      ((binding-form (eql ,name)))
+	         collect
+		 `(defmethod binding-form-accepts-multiple-forms-p
+		      ((binding-form ,(if (keywordp name) `(eql ,name) name)))
 		    ,accept-multiple-forms-p))
 	 (,(if multiple-names? 'defun 'defmethod) ,main-method-name
            (,@(unless multiple-names?

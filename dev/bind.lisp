@@ -195,7 +195,8 @@ of arguments and then the function body (in an implicit progn)."
 				     (first variable-form))))
 	(when (and (consp value-form) 
 		   (cdr value-form)
-		   (or (null binding-form)
+		   (if (null binding-form)
+                       (not (binding-form-accepts-multiple-forms-p variable-form))
 		       (not (binding-form-accepts-multiple-forms-p binding-form))))
 	  (error 'bind-too-many-value-forms-error 
 		:variable-form variable-form :value-form value-form))
